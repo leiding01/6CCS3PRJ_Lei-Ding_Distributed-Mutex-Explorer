@@ -1,0 +1,5 @@
+scenario,size_states,input_length,run_id,render_ms,run_ms,notes
+scenario,size_states,input_length,run_id,render_ms,run_ms,notes
+even_zeros,2,6,1,,,"manual demo; ACCEPT/REJECT ok"
+ends_with_ab,3,3,1,,,""
+

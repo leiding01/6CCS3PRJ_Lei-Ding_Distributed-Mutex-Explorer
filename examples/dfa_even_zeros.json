@@ -1,0 +1,37 @@
+{
+  "states": [
+    "q0",
+    "q1"
+  ],
+  "alphabet": [
+    "0",
+    "1"
+  ],
+  "start": "q0",
+  "accepts": [
+    "q0"
+  ],
+  "transitions": [
+    {
+      "from": "q0",
+      "symbol": "0",
+      "to": "q1"
+    },
+    {
+      "from": "q0",
+      "symbol": "1",
+      "to": "q0"
+    },
+    {
+      "from": "q1",
+      "symbol": "0",
+      "to": "q0"
+    },
+    {
+      "from": "q1",
+      "symbol": "1",
+      "to": "q1"
+    }
+  ],
+  "type": "DFA"
+}

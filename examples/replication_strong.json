@@ -1,0 +1,10 @@
+{
+  "type": "ReplicationDemo",
+  "replicas": ["R1","R2","R3"],
+  "consistency": "strong",
+  "network": { "latencyMs": [20,40], "partition": [] },
+  "ops": [
+    {"t":0,  "op":"write", "key":"x", "val":1, "on":"R1"},
+    {"t":20, "op":"read",  "key":"x", "on":"R2"}
+  ]
+}

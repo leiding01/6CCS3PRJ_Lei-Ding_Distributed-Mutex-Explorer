@@ -3,120 +3,228 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FSM Educational Tool — DFA (v0.2)</title>
+  <title>Distributed Mutual Exclusion Explorer (v0.3)</title>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 20px; }
-    header { display: flex; align-items: baseline; gap: 12px; }
-    h1 { font-size: 20px; margin: 0; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    fieldset { border: 1px solid #ccc; border-radius: 8px; padding: 12px; }
-    legend { padding: 0 6px; color: #444; }
-    label { display: inline-block; margin: 4px 0; }
-    input[type=text] { padding: 6px; }
-    button { padding: 6px 10px; margin: 2px; }
-    ul { list-style: none; padding-left: 0; }
-    li { padding: 4px 6px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; }
-    li.current { background: #e6f2ff; }
-    .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .note { color: #666; font-size: 12px; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
-    .ok { color: #0a7d00; }
-    .bad { color: #a10000; }
-    .pill { padding: 2px 6px; border-radius: 10px; background: #eee; }
-    .accent { color: #0a7d00; font-weight: 600; }
-    .toolbar { display: flex; align-items: center; gap: 8px; }
-    #trace { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: nowrap; overflow-x: auto; }
-    #previewWrap { display: grid; grid-template-columns: 1fr; gap: 8px; }
-    #previewCanvas { border: 1px dashed #bbb; border-radius: 8px; }
+    :root {
+      --border: #d0d0d0;
+      --text: #111;
+      --muted: #666;
+      --bg: #fff;
+      --panel: #fafafa;
+      --ok: #0a7d00;
+      --bad: #a10000;
+    }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 20px;
+      color: var(--text);
+      background: var(--bg);
+    }
+    header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+    .pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #eee;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 6px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 12px;
+    }
+    fieldset {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      background: var(--panel);
+    }
+    legend {
+      padding: 0 6px;
+      color: #444;
+    }
+    label { display: inline-block; margin: 2px 0; }
+    input[type=text], input[type=number], select {
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+    }
+    button {
+      padding: 6px 10px;
+      margin: 2px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    table { border-collapse: collapse; width: 100%; background: #fff; border-radius: 10px; overflow: hidden; }
+    th, td { border: 1px solid #e3e3e3; padding: 8px; text-align: left; vertical-align: middle; }
+    th { background: #f3f3f3; }
+    .ok { color: var(--ok); font-weight: 700; }
+    .bad { color: var(--bad); font-weight: 700; }
+    #trace {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      background: #fff;
+      border: 1px solid #e3e3e3;
+      border-radius: 10px;
+      padding: 10px;
+      max-height: 220px;
+      overflow: auto;
+      white-space: pre;
+    }
+    #previewCanvas {
+      border: 1px dashed #bbb;
+      border-radius: 10px;
+      background: #fff;
+      max-width: 100%;
+    }
   </style>
 </head>
+
 <body>
   <header>
-    <h1>FSM Educational Tool — DFA (v0.2)</h1>
-    <span class="pill">trace · delete state · undo · PNG export</span>
+    <h1>Distributed Mutual Exclusion Explorer (v0.3)</h1>
+    <span class="pill">token ring + Ricart–Agrawala · step/run · faults · JSON/PNG export</span>
   </header>
-
-  <div class="toolbar">
-    <button id="undoBtn" title="Undo last action">Undo</button>
-    <button id="clearAllBtn">Clear all</button>
-  </div>
-  <p class="note">Minimal but practical: add states/transitions, set start/accept, run & step a DFA; trace panel; delete state; undo; preview canvas + Export PNG. JSON import/export supported.</p>
+  <p class="note">
+    An interactive, browser-based simulator to visualise distributed mutual exclusion. Configure processes, issue requests for a critical section, and observe how tokens or messages enforce exclusivity. The prototype supports token loss, process crash/recovery, and basic message loss (RA).
+  </p>
 
   <div class="grid">
     <fieldset>
-      <legend>States</legend>
+      <legend>Configuration</legend>
       <div class="row">
-        <label>New state:</label>
-        <input id="stateName" type="text" placeholder="q0" />
-        <button id="addStateBtn">Add</button>
+        <label for="algorithmSelect">Algorithm:</label>
+        <select id="algorithmSelect">
+          <option value="TokenRing" selected>Token Ring (implemented)</option>
+          <option value="RA">Ricart–Agrawala (prototype)</option>
+        </select>
       </div>
       <div class="row">
-        <label>Start state:</label>
-        <select id="startSelect"></select>
+        <label for="procCount">Processes:</label>
+        <input id="procCount" type="number" min="2" max="12" value="4" />
+        <button id="applyConfigBtn">Apply (reset)</button>
+        <span class="pill" id="modePill">interactive</span>
       </div>
-      <div class="row">
-        <label>Accept states:</label>
-        <select id="acceptSelect" multiple size="4" style="min-width: 150px;"></select>
-      </div>
-      <ul id="stateList"></ul>
+      <p class="note">Keep small numbers (3–8) for clarity. Apply resets the simulation state.</p>
     </fieldset>
 
     <fieldset>
-      <legend>Transitions (DFA)</legend>
+      <legend>Controls</legend>
       <div class="row">
-        <label>From:</label>
-        <select id="fromState"></select>
-        <label>Symbol:</label>
-        <input id="symbol" type="text" maxlength="1" placeholder="a"/>
-        <label>To:</label>
-        <select id="toState"></select>
-        <button id="addTransBtn">Add transition</button>
+        <button id="stepBtn">Step</button>
+        <button id="runBtn">Run</button>
+        <button id="pauseBtn" disabled>Pause</button>
+        <button id="resetBtn">Reset</button>
       </div>
-      <p class="note">DFA rule: at most one transition per (state, symbol). Duplicates are prevented.</p>
-      <table>
-        <thead><tr><th>From</th><th>Symbol</th><th>To</th><th></th></tr></thead>
-        <tbody id="transTable"></tbody>
-      </table>
+      <div class="row">
+        <label for="speedMs">Run speed (ms):</label>
+        <input id="speedMs" type="number" min="50" max="2000" value="350" />
+      </div>
+      <div class="row">
+        <button id="dropTokenBtn">Drop token</button>
+        <button id="regenTokenBtn">Regenerate token</button>
+        <button id="dropNextMsgBtn">Drop next message</button>
+        <button id="clearTraceBtn">Clear trace</button>
+      </div>
+      <div class="row">
+        <div>Safety: <strong id="safetyLabel">—</strong></div>
+        <span class="pill" id="metricsPill">—</span>
+      </div>
+      <p class="note">Token controls apply to Token Ring; message drop applies to Ricart–Agrawala.</p>
     </fieldset>
   </div>
 
   <fieldset>
-    <legend>Run / Step</legend>
-    <div class="row">
-      <label>Input string:</label>
-      <input id="inputStr" type="text" placeholder="abba"/>
-      <button id="runBtn">Run</button>
-      <button id="stepBtn">Step</button>
-      <button id="resetBtn">Reset</button>
-      <span>Current state: <strong id="currentStateLabel">—</strong></span>
-    </div>
-    <div id="runResult"></div>
-    <div><strong>Trace:</strong> <span id="trace">—</span></div>
+    <legend>Processes</legend>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 120px;">Process</th>
+          <th>Status</th>
+          <th style="width: 80px;">Token</th>
+          <th style="width: 360px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="procTable"></tbody>
+    </table>
+    <p class="note">Status shows whether a process is requesting access or is currently in the critical section.</p>
   </fieldset>
 
   <fieldset>
-    <legend>Import / Export</legend>
+    <legend>Network (messages)</legend>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 70px;">ID</th>
+          <th style="width: 90px;">Type</th>
+          <th style="width: 120px;">From</th>
+          <th style="width: 120px;">To</th>
+          <th style="width: 90px;">TS</th>
+        </tr>
+      </thead>
+      <tbody id="msgTable"></tbody>
+    </table>
+    <p class="note">For Ricart–Agrawala, each Step typically delivers one message from the queue.</p>
+  </fieldset>
+
+  <fieldset>
+    <legend>Scenarios</legend>
     <div class="row">
-      <button id="exportBtn">Export JSON</button>
-      <input id="importFile" type="file" accept="application/json"/>
-      <button id="loadExample1">Load Example: Even number of 0s</button>
-      <button id="loadExample2">Load Example: Ends with 'ab'</button>
+      <button id="exportBtn">Export JSON (state)</button>
+      <input id="importFile" type="file" accept="application/json" />
+      <button id="loadExampleInteractiveBtn">Load example (interactive)</button>
+      <button id="loadExampleScriptBtn">Load example (scripted)</button>
+      <button id="loadCrashDemoBtn">Load crash demo (scripted)</button>
+      <button id="loadRaDemoBtn">Load RA conflict demo (scripted)</button>
+      <button id="loadRaTieDemoBtn">Load RA tiebreak demo (scripted)</button>
+      <button id="exitScriptBtn" disabled>Exit script mode</button>
     </div>
+    <p class="note">Interactive mode lets you issue requests manually. Scripted mode replays a predefined event sequence from a JSON scenario file.</p>
+  </fieldset>
+
+  <fieldset>
+    <legend>Trace</legend>
+    <div id="trace">—</div>
   </fieldset>
 
   <fieldset>
     <legend>Preview & Export PNG</legend>
-    <div id="previewWrap">
-      <div class="row">
-        <button id="redrawBtn">Redraw preview</button>
-        <button id="exportPngBtn">Export PNG</button>
-      </div>
-      <canvas id="previewCanvas" width="900" height="520"></canvas>
-      <p class="note">The preview uses a simple circular layout; it is sufficient for a small to medium number of states. Self-loops are rendered above the state.</p>
+    <div class="row">
+      <button id="redrawBtn">Redraw</button>
+      <button id="exportPngBtn">Export PNG</button>
     </div>
+    <canvas id="previewCanvas" width="900" height="520"></canvas>
+    <p class="note">The preview uses a circular layout. Token Ring shows token position; RA highlights the next message to be delivered.</p>
   </fieldset>
 
-  <script type="module" src="main.js"></script>
+  <script type="module" src="./mutex_main.js"></script>
 </body>
 </html>

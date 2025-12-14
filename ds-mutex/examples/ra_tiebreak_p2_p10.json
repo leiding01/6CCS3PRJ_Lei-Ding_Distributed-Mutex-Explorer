@@ -1,0 +1,25 @@
+{
+  "type": "MutexDemo",
+  "algorithm": "RA",
+  "processes": ["P2", "P10"],
+  "ring": ["P2", "P10"],
+  "meta": {
+    "name": "RA — Tie-break (P2 vs P10)",
+    "description": "Both request at the same logical time. Correct tie-break is numeric PID: P2 should enter CS before P10.",
+    "version": "v0.3"
+  },
+  "events": [
+    { "t": 0, "op": "requestCS", "on": "P2" },
+    { "t": 1, "op": "requestCS", "on": "P10" },
+
+    { "t": 2, "op": "deliverNext" },
+    { "t": 3, "op": "deliverNext" },
+    { "t": 4, "op": "deliverNext" },
+
+    { "t": 5, "op": "releaseCS", "on": "P2" },
+
+    { "t": 6, "op": "deliverNext" },
+
+    { "t": 7, "op": "releaseCS", "on": "P10" }
+  ]
+}

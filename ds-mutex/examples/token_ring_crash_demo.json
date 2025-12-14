@@ -1,0 +1,28 @@
+{
+  "type": "MutexDemo",
+  "algorithm": "TokenRing",
+  "processes": ["P1", "P2", "P3", "P4"],
+  "ring": ["P1", "P2", "P3", "P4"],
+  "meta": {
+    "name": "Token Ring — Crash & Recovery Demo",
+    "description": "Demonstrates a token-holder crash while in the critical section, followed by process recovery and token regeneration, then normal progress resumes.",
+    "version": "v0.2"
+  },
+  "events": [
+    { "t": 0, "op": "holdToken", "on": "P1" },
+    { "t": 1, "op": "requestCS", "on": "P1" },
+
+    { "t": 2, "op": "crash", "on": "P1" },
+    { "t": 3, "op": "recover", "on": "P1" },
+    { "t": 4, "op": "regenerateToken", "on": "P2" },
+
+    { "t": 5, "op": "passToken", "from": "P2", "to": "P3" },
+    { "t": 6, "op": "requestCS", "on": "P3" },
+    { "t": 7, "op": "releaseCS", "on": "P3" },
+
+    { "t": 8, "op": "passToken", "from": "P3", "to": "P4" },
+    { "t": 9, "op": "passToken", "from": "P4", "to": "P1" },
+    { "t": 10, "op": "requestCS", "on": "P1" },
+    { "t": 11, "op": "releaseCS", "on": "P1" }
+  ]
+}

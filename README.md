@@ -70,6 +70,8 @@ The codebase is dependency-free (HTML/JS/CSS) and runs locally or on GitHub Page
 
 ---
 
+not part of final artefact
+
 ## Student
 - Name: **Lei Ding**  
 - K number: **K21029011**

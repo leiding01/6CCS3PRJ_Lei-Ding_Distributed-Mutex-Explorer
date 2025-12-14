@@ -1,0 +1,29 @@
+{
+  "type": "MutexDemo",
+  "algorithm": "RA",
+  "processes": ["P1", "P2", "P3"],
+  "ring": ["P1", "P2", "P3"],
+  "meta": {
+    "name": "Ricart–Agrawala — Conflict Demo",
+    "description": "Two concurrent requests (P1 and P2) with tie-break by process ID. Messages are delivered one-by-one to show REQUEST/REPLY flow, deferral, and CS entry.",
+    "version": "v0.3"
+  },
+  "events": [
+    { "t": 0, "op": "requestCS", "on": "P1" },
+    { "t": 1, "op": "requestCS", "on": "P2" },
+
+    { "t": 2, "op": "deliverNext" },
+    { "t": 3, "op": "deliverNext" },
+    { "t": 4, "op": "deliverNext" },
+    { "t": 5, "op": "deliverNext" },
+    { "t": 6, "op": "deliverNext" },
+    { "t": 7, "op": "deliverNext" },
+
+    { "t": 8, "op": "releaseCS", "on": "P1" },
+
+    { "t": 9, "op": "deliverNext" },
+    { "t": 10, "op": "deliverNext" },
+
+    { "t": 11, "op": "releaseCS", "on": "P2" }
+  ]
+}

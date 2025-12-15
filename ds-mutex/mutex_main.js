@@ -3,6 +3,7 @@
   - Token Ring + Ricart–Agrawala (prototype)
   - Scripted demos supported for both
   - Faults: token loss, crash/recover, message drop (RA)
+  - Evidence: exportable trace + scenario panel (name/description/progress/next events)
   - Dependency-free, browser-only
 */
 
@@ -60,6 +61,7 @@ const els = {
   trace: $('trace'),
 
   exportBtn: $('exportBtn'),
+  exportTraceBtn: $('exportTraceBtn'),
   importFile: $('importFile'),
   loadExampleInteractiveBtn: $('loadExampleInteractiveBtn'),
   loadExampleScriptBtn: $('loadExampleScriptBtn'),
@@ -67,6 +69,11 @@ const els = {
   loadRaDemoBtn: $('loadRaDemoBtn'),
   loadRaTieDemoBtn: $('loadRaTieDemoBtn'),
   exitScriptBtn: $('exitScriptBtn'),
+
+  scenarioPill: $('scenarioPill'),
+  scriptProgressPill: $('scriptProgressPill'),
+  scenarioDesc: $('scenarioDesc'),
+  nextEvents: $('nextEvents'),
 
   previewCanvas: $('previewCanvas'),
   redrawBtn: $('redrawBtn'),
@@ -138,6 +145,45 @@ function exportState() {
   URL.revokeObjectURL(url);
 }
 
+function formatTraceForExport(m) {
+  if (!m.trace || m.trace.length === 0) return '';
+  const lines = m.trace.map((e) => {
+    const tag = e.kind === 'warn' ? '!' : ' ';
+    return `[${String(e.step).padStart(3, '0')}]${tag} ${e.text}`;
+  });
+  return lines.join('\n') + '\n';
+}
+
+function exportTrace() {
+  const ts = new Date().toISOString().replace(/[:.]/g, '-');
+  const algo = String(model.algorithm || 'algo');
+  const mode = String(model.mode || 'mode');
+  const name = model.mode === 'script' && model.script?.name ? model.script.name : 'trace';
+  const safeName = String(name).replace(/[^\w.-]+/g, '_').slice(0, 60);
+  const filename = `mutex_${algo}_${mode}_${safeName}_${ts}.txt`;
+
+  const header = [
+    `Distributed Mutual Exclusion Explorer`,
+    `algorithm: ${algo}`,
+    `mode: ${mode}`,
+    `scenario: ${model.mode === 'script' ? (model.script?.name || '') : ''}`,
+    `description: ${model.mode === 'script' ? (model.script?.description || '') : ''}`,
+    `exported: ${new Date().toISOString()}`,
+    '',
+  ].join('\n');
+
+  const body = formatTraceForExport(model) || '(empty trace)\n';
+  const text = header + body;
+
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 async function loadExample(path) {
   const res = await fetch(path);
   if (!res.ok) throw new Error(`Failed to load: ${path}`);
@@ -146,7 +192,12 @@ async function loadExample(path) {
 
 function importJsonObject(obj) {
   stopRun();
-  model = loadFromJsonObject(obj);
+  try {
+    model = loadFromJsonObject(obj);
+  } catch (err) {
+    alert(err?.message || String(err));
+    return;
+  }
   els.algorithmSelect.value = model.algorithm;
   els.procCount.value = String(model.processes.length);
   setMode(model.mode);
@@ -273,11 +324,7 @@ function renderTrace() {
     els.trace.textContent = '—';
     return;
   }
-  const lines = model.trace.map((e) => {
-    const tag = e.kind === 'warn' ? '!' : ' ';
-    return `[${String(e.step).padStart(3, '0')}]${tag} ${e.text}`;
-  });
-  els.trace.textContent = lines.join('\n');
+  els.trace.textContent = formatTraceForExport(model);
   els.trace.scrollTop = els.trace.scrollHeight;
 }
 
@@ -292,10 +339,54 @@ function renderSafetyAndMetrics() {
   } else if (model.algorithm === 'RA') {
     const m = model.metrics;
     const qLen = model.network?.queue?.length ?? 0;
-    els.metricsPill.textContent = `entries: ${m.csEntries} · releases: ${m.csReleases} · sent: ${m.messagesSent} · delivered: ${m.messagesDelivered} · dropped: ${m.messagesDropped} · queue: ${qLen}`;
+    els.metricsPill.textContent =
+      `entries: ${m.csEntries} · releases: ${m.csReleases} · sent: ${m.messagesSent} · delivered: ${m.messagesDelivered} · dropped: ${m.messagesDropped} · queue: ${qLen}`;
   } else {
     els.metricsPill.textContent = '—';
   }
+}
+
+function formatScriptEvent(evt) {
+  if (!evt || typeof evt !== 'object') return '(invalid event)';
+  const t = evt.t != null ? `t=${evt.t}` : '';
+  const op = evt.op != null ? String(evt.op) : '';
+  const on = evt.on != null ? ` on=${evt.on}` : '';
+  const from = evt.from != null ? ` from=${evt.from}` : '';
+  const to = evt.to != null ? ` to=${evt.to}` : '';
+  const ts = evt.ts != null ? ` ts=${evt.ts}` : '';
+  return `${t} ${op}${on}${from}${to}${ts}`.trim();
+}
+
+function renderScenarioPanel() {
+  if (model.mode !== 'script') {
+    els.scenarioPill.textContent = `scenario: interactive`;
+    els.scriptProgressPill.textContent = `script: —`;
+    els.scenarioDesc.textContent = `Interactive mode: use Request CS / Release CS, Step/Run, and fault controls.`;
+    els.nextEvents.textContent = '—';
+    return;
+  }
+
+  const name = model.script?.name ? String(model.script.name) : 'Scripted demo';
+  const desc = model.script?.description ? String(model.script.description) : '';
+  const total = model.script?.events?.length ?? 0;
+  const idx = model.script?.index ?? 0;
+
+  els.scenarioPill.textContent = `scenario: ${name}`;
+  els.scriptProgressPill.textContent = `script: ${idx}/${total}`;
+  els.scenarioDesc.textContent = desc || '—';
+
+  const events = Array.isArray(model.script?.events) ? model.script.events : [];
+  const upcoming = events.slice(idx, Math.min(events.length, idx + 8));
+  if (upcoming.length === 0) {
+    els.nextEvents.textContent = '(no upcoming events)';
+    return;
+  }
+
+  const lines = upcoming.map((e, k) => {
+    const n = idx + k + 1;
+    return `${String(n).padStart(3, '0')}. ${formatScriptEvent(e)}`;
+  });
+  els.nextEvents.textContent = lines.join('\n');
 }
 
 function drawPreview() {
@@ -458,6 +549,7 @@ function render() {
   els.exitScriptBtn.disabled = model.mode !== 'script';
 
   renderControlsEnabledState();
+  renderScenarioPanel();
   renderProcessTable();
   renderMessageTable();
   renderTrace();
@@ -522,6 +614,7 @@ els.clearTraceBtn.addEventListener('click', () => {
 });
 
 els.exportBtn.addEventListener('click', exportState);
+els.exportTraceBtn.addEventListener('click', exportTrace);
 
 els.importFile.addEventListener('change', (e) => {
   const file = e.target.files?.[0];
@@ -606,5 +699,5 @@ els.exportPngBtn.addEventListener('click', () => {
 
 // Initial render
 clearTrace(model);
-logEvent(model, 'Ready. Choose an algorithm and use Request CS + Step/Run. RA: Step delivers one message.', 'info');
+logEvent(model, 'Ready. Choose an algorithm and use Request CS + Step/Run. Script mode: Step/Run executes events.', 'info');
 render();

@@ -1,63 +1,36 @@
-# Variant 3 — Distributed Mutual Exclusion Explorer (One-Page Brief)
+# Variant 3 — Distributed Mutual Exclusion Explorer (v0.3) — One Page Brief
 
 **Student:** Lei Ding (K21029011)  
-**Supervisor:** Dr Angelos Georgoulas  
-**Programme/Stage:** BSc Computer Science, Year 3  
-**Project theme:** Interactive Tools for Learning Distributed Systems Concepts
+**Programme:** BSc Computer Science (Year 3)  
+**Supervisor:** Angelos Georgoulas  
+**Project theme/title (allocated):** Interactive Tools for Learning Distributed Systems Concepts — Variant 3 (Distributed Mutual Exclusion Explorer)
 
-## Overview
-Distributed mutual exclusion ensures that **at most one process** at a time can enter a **critical section** while coordinating via message passing (or tokens) over a network. The goal of this project is to build an interactive tool that helps students *see* how mutual exclusion algorithms behave under concurrency and faults, rather than only reading static diagrams or pseudocode.
+## Problem
+Distributed mutual exclusion (DME) ensures that at most one process accesses a shared critical section at any time in a distributed system. Concepts such as concurrent requests, message ordering, and fault behaviour are abstract and difficult to understand via static lectures alone.
 
-## Technology artefact
-A deployable, browser-based educational simulator called the **Distributed Mutual Exclusion Explorer**:
-- Users can configure the number of processes and select an algorithm.
-- Users can issue requests to enter a critical section and observe algorithm behaviour step-by-step or via playback.
-- The interface visualises which process currently holds the shared resource and the status of outstanding requests.
-- Fault scenarios such as token loss and process crashes are supported, including teaching-oriented recovery actions.
+## Proposed artefact and technology stack (BCS practical artefact)
+I am producing a **browser-based interactive simulator** that visualises distributed mutual exclusion algorithms and failure scenarios.  
+**Stack:** dependency-free **HTML/CSS/JavaScript (ES modules)** running locally (static files) or deployable on **GitHub Pages**, with **Canvas** for visual preview, and **JSON** for scenario/state import-export. No personal data are collected.
 
-This satisfies the BCS requirement for substantial practical computing work via the design, implementation, and evaluation of a software artefact.
-
-## Technology stack
-- **Front-end:** HTML5 + CSS + modern JavaScript (ES modules)
-- **Architecture:** dependency-free, client-side only (no server-side logic required)
-- **Deployment:** static hosting (GitHub Pages) and local HTTP server (`python -m http.server`)
-- **Artefact outputs:** JSON import/export for scenarios and state; PNG export for the visual preview
-
-## Current progress (prototype v0.2)
-Implemented: **Token Ring** mutual exclusion (token-based approach)
-- Interactive mode:
-  - Configurable process count
-  - Per-process actions: request critical section / release
-  - Step/run simulation with trace panel
-  - Visual preview (ring layout), exportable as PNG
-- Fault scenarios and recovery:
-  - **Token loss** + **token regeneration**
-  - **Process crash** + **process recovery**
-- Correctness support:
-  - Safety invariant check: detects violations of mutual exclusion (>1 process in CS)
-
-Scripted demonstrations:
-- JSON-driven scripted demos (replayable scenarios) for consistent teaching and evaluation evidence.
-
-## Planned next steps
-Algorithm coverage:
-- Implement **Ricart–Agrawala** (message-based mutual exclusion) to contrast with token-based approaches.
-- Provide visualisation of REQUEST/REPLY messages, deferred replies, and waiting conditions.
-
-Fault modelling:
-- Add controlled network conditions (message delay/drop) for message-based scenarios.
-- Extend fault handling scenarios with clear, teaching-oriented recovery narratives.
-
-Pedagogy and clarity:
-- Improve in-tool explanations tied to trace steps (e.g., “why can/can’t this process enter CS now?”).
-- Add lightweight metrics (e.g., token passes/messages, waiting time) to illustrate trade-offs.
+## Current status (v0.3)
+Implemented two algorithm variants with step-by-step replay and clear visual state:
+- **Token Ring (token-based mutual exclusion):** request/release, token passing, scripted scenarios.
+- **Faults + recovery (Token Ring):** token loss, process crash/recover, token regeneration.
+- **Ricart–Agrawala (prototype, message-based):** explicit message queue visualisation; each Step typically delivers one queued message to show REQUEST/REPLY flow and deferrals.
+- **Fault injection (RA):** drop-next-message (disabled when queue empty) to demonstrate loss effects.
+- **Reproducibility:** scripted JSON demos + exportable JSON state + PNG export of the preview; trace log as evidence for report figures.
 
 ## Evaluation plan
-- **Correctness:** scenario-based checks and invariants (safety; controlled liveness demonstrations under faults)
-- **Performance:** compare behaviour under different process counts and fault conditions (token passes/messages, steps to enter CS)
-- **Usability & educational value:** heuristic evaluation (Nielsen) + small study tasks (students explain/answer questions after using the tool)
+- **Correctness:** safety invariant (mutual exclusion), algorithm trace inspection across scripted demos and interactive exploration.
+- **Usability:** Nielsen heuristic checklist + optional small SUS questionnaire with short tasks (if participants available).
+- **Pedagogical clarity:** observe whether learners can answer “who holds the resource?”, “why is a reply deferred?”, “what blocks progress under failures?”.
 
-## Professional considerations
-- **Accessibility:** avoid colour-only encoding; clear labels; keyboard-friendly controls where feasible
-- **Privacy:** no personal data collection; evaluation data anonymised
-- **Sustainability:** lightweight, dependency-free static web app suitable for reuse in teaching labs
+## Next steps
+- Write the BSPR with requirements/specification, architecture notes, and risk plan.
+- Build a literature base (>=30 citations) covering DME algorithms, algorithm visualisation/CS education, usability evaluation, accessibility, and reproducibility (see `report/references.bib`).
+- Capture report figures (screenshots) from each demo (Token Ring basic, crash/recovery, RA conflict, RA tie-break).
+- Run a small usability check and record findings/actions.
+
+## Key risks
+- Over-scoping beyond a stable educational prototype (mitigation: focus on clarity + evidence + evaluation rather than adding more algorithms).
+- Fault modelling complexity (mitigation: explicitly state assumptions and limitations in the report).

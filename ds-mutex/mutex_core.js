@@ -70,7 +70,7 @@ export function makeTokenRingModel(procCount) {
   return {
     type: 'MutexState',
     algorithm: 'TokenRing',
-    mode: 'interactive', // 'interactive' | 'script'
+    mode: 'interactive',
 
     processes,
     ring,
@@ -92,6 +92,8 @@ export function makeTokenRingModel(procCount) {
     },
 
     script: {
+      name: '',
+      version: '',
       description: '',
       events: [],
       index: 0,
@@ -144,6 +146,8 @@ export function makeRAModel(procCount) {
     },
 
     script: {
+      name: '',
+      version: '',
       description: '',
       events: [],
       index: 0,
@@ -905,13 +909,16 @@ export function loadFromJsonObject(obj) {
       model.token.lost = false;
     }
 
+    clearTrace(model);
+
+    model.script.name = obj.meta?.name || '';
+    model.script.version = obj.meta?.version || '';
     model.script.description = obj.meta?.description || '';
     model.script.events = Array.isArray(obj.events) ? [...obj.events].sort((a, b) => (a.t || 0) - (b.t || 0)) : [];
     model.script.index = 0;
     model.mode = 'script';
 
-    clearTrace(model);
-    logEvent(model, `Loaded scripted scenario: ${model.script.description || `${algo} demo`}.`);
+    logEvent(model, `Loaded scripted scenario: ${model.script.description || (model.script.name || `${algo} demo`)}.`);
     return model;
   }
 

@@ -88,7 +88,6 @@
     th { background: #f3f3f3; }
     .ok { color: var(--ok); font-weight: 700; }
     .bad { color: var(--bad); font-weight: 700; }
-
     #trace {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 12px;
@@ -100,26 +99,6 @@
       overflow: auto;
       white-space: pre;
     }
-
-    #nextEvents {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 12px;
-      background: #fff;
-      border: 1px solid #e3e3e3;
-      border-radius: 10px;
-      padding: 10px;
-      max-height: 160px;
-      overflow: auto;
-      white-space: pre;
-      margin-top: 8px;
-    }
-
-    #scenarioDesc {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 6px;
-    }
-
     #previewCanvas {
       border: 1px dashed #bbb;
       border-radius: 10px;
@@ -172,14 +151,15 @@
       <div class="row">
         <button id="dropTokenBtn">Drop token</button>
         <button id="regenTokenBtn">Regenerate token</button>
-        <button id="dropNextMsgBtn">Drop next message</button>
+        <button id="dropNextMsgBtn">Drop next in-flight msg</button>
+        <button id="toggleDropNextSendBtn">Arm drop-next-send</button>
         <button id="clearTraceBtn">Clear trace</button>
       </div>
       <div class="row">
         <div>Safety: <strong id="safetyLabel">—</strong></div>
         <span class="pill" id="metricsPill">—</span>
       </div>
-      <p class="note">Token controls apply to Token Ring; message drop applies to Ricart–Agrawala.</p>
+      <p class="note">Token controls apply to Token Ring. For Ricart–Agrawala, “Drop next in-flight msg” removes the queue head; “drop-next-send” drops the next outgoing message.</p>
     </fieldset>
   </div>
 
@@ -218,14 +198,11 @@
 
   <fieldset>
     <legend>Scenarios</legend>
-
     <div class="row">
       <button id="exportBtn">Export JSON (state)</button>
       <button id="exportTraceBtn">Export trace (txt)</button>
+      <button id="exportAllBtn">Export evidence (JSON+trace+PNG)</button>
       <input id="importFile" type="file" accept="application/json" />
-    </div>
-
-    <div class="row">
       <button id="loadExampleInteractiveBtn">Load example (interactive)</button>
       <button id="loadExampleScriptBtn">Load example (scripted)</button>
       <button id="loadCrashDemoBtn">Load crash demo (scripted)</button>
@@ -233,19 +210,7 @@
       <button id="loadRaTieDemoBtn">Load RA tiebreak demo (scripted)</button>
       <button id="exitScriptBtn" disabled>Exit script mode</button>
     </div>
-
-    <div class="row">
-      <span class="pill" id="scenarioPill">scenario: —</span>
-      <span class="pill" id="scriptProgressPill">script: —</span>
-    </div>
-
-    <div id="scenarioDesc">—</div>
-    <div class="note">Next events (script mode only):</div>
-    <div id="nextEvents">—</div>
-
-    <p class="note">
-      Interactive mode lets you issue requests manually. Scripted mode replays a predefined event sequence from a JSON scenario file.
-    </p>
+    <p class="note">Interactive mode lets you issue requests manually. Scripted mode replays a predefined event sequence from a JSON scenario file. Exports use a session timestamp + snapshot counter for easier evidence management.</p>
   </fieldset>
 
   <fieldset>

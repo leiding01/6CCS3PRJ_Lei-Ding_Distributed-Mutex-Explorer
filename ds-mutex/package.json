@@ -1,0 +1,8 @@
+{
+  "name": "ds-mutex",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tools/smoke_tests.mjs"
+  }
+}

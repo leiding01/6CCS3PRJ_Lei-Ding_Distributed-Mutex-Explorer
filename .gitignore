@@ -2,3 +2,7 @@
 Thumbs.db
 .vscode/
 *.zip
+# DS-Mutex: generated exports (evidence snapshots)
+ds-mutex/report/figures/export/**
+!ds-mutex/report/figures/export/README.md
+!ds-mutex/report/figures/export/.gitkeep

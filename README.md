@@ -1,77 +1,132 @@
-Live demo: https://leiding01.github.io/fsm-educational-tool/  
-Focus: Minimal, reproducible educational tool. Planned: NFA + ε-closure and subset construction; keyboard shortcuts; tutorial mode.
+# Distributed Mutual Exclusion Explorer (Variant 3)
 
-# FSM Educational Tool — DFA (v0.2)
+A dependency-free, browser-based interactive tool for learning **Distributed Mutual Exclusion** concepts.
+It visualises how *token-based* and *message-based* algorithms enforce exclusive access to a critical section, and how **faults** affect safety and liveness.
 
-[![Live demo](https://img.shields.io/badge/demo-GitHub%20Pages-blue)](https://leiding01.github.io/fsm-educational-tool/)
-
-A minimal, teaching-oriented web tool to build and run deterministic finite automata (DFA).  
-This version adds a **trace panel**, **delete state**, a simple **Undo**, and a **preview canvas with PNG export**.  
-The codebase is dependency-free (HTML/JS/CSS) and runs locally or on GitHub Pages.
-
-## Highlights (engineering-focused)
-- Deterministic finite automata (DFA) **visualiser**: trace panel, delete state, Undo, preview canvas with **Export PNG**, **JSON import/export**.
-- Defensive UI: prevents duplicate `(state, symbol)` transitions; clear error messages (e.g. missing δ-transition).
-- Reproducible set-up: one-click local server scripts, example models, black-box tests, a timing CSV, and a Nielsen heuristic checklist.
-- Clean, dependency-free front-end that works offline and on GitHub Pages.
-
-## Roadmap (v0.3 — planned, small and safe)
-- **NFA** support with **ε-closure**, plus **subset construction** view (NFA→DFA) and dual-view toggle.
-- **Redo** and keyboard shortcuts (Ctrl+Z, Del, Enter), with lightweight toast notifications.
-- One-click **Export ZIP** (current JSON + PNG preview).
-- Small test pack (≈10 JSON models) + batch timing; **Tutorial mode** (short guided steps) if time allows.
-
-> The roadmap will be tracked as GitHub Issues for transparency and scope control.
-
-## Evaluation & reproducibility
-- Black-box examples in `examples/`, expected behaviours in `tests/spec_fsm_core.md`.
-- Timing sheet: `eval/fsm_timing.csv`; usability checklist: `eval/nielsen_checklist.md`.
-- Figures/screenshots in `report/figures/` (used as evidence in the checklist).  
-- Exportable artefacts: JSON models and PNG previews enable exact reproduction.
+This repository is structured as a single artefact (the `index.html` app) plus evaluation and report materials.
 
 ---
 
-## Quick start
-- Open this folder in VS Code and use *Live Server* **or** run:
-  ```bash
-  python -m http.server 5500
-  ```
-  then visit <http://localhost:5500/index.html>.
+## What this artefact is
 
-- Windows: `start_server.bat`  
-- macOS/Linux: `start_server.sh`
+**Technology artefact:** an interactive web simulator/visualiser for distributed mutual exclusion (educational tool).  
+**Stack:** plain HTML/CSS/JavaScript (no framework, no external dependencies), runs locally or on GitHub Pages.
 
-## Features
-- Create/delete states; set start and accept states.
-- Add/delete transitions (**DFA rule**: at most one per `(state, symbol)`).
-- Run/Step an input string; see **ACCEPT/REJECT** and the **trace**.
-- Import/Export JSON.
-- Preview canvas (circular layout) and **Export PNG**.
-- **Undo** common actions (add/delete state, add/delete transition, set start/accepts, clear all).
+---
 
-## JSON schema (simplified)
-```json
-{
-  "states": ["q0", "q1"],
-  "alphabet": ["a", "b"],
-  "start": "q0",
-  "accepts": ["q1"],
-  "transitions": [
-    {"from": "q0", "symbol": "a", "to": "q1"}
-  ],
-  "type": "DFA"
-}
+## Implemented / supported
+
+### Algorithms
+- **Token Ring** (implemented)
+- **Ricart–Agrawala** (prototype)
+
+### Interactions
+- Configure number of processes (small n recommended for teaching clarity)
+- Issue **Request CS** / **Release CS**
+- Step / Run execution
+- Scripted demo replays via JSON scenarios
+
+### Fault injection + recovery (teaching-oriented)
+- Token Ring: token loss + token regeneration
+- Token Ring / RA: process crash + recover
+- Ricart–Agrawala: message faults
+  - **Drop next in-flight message** (drops the queue head)
+  - **Drop-next-send** (arm/disarm; drops the next outgoing message)
+
+Notes:
+- In Ricart–Agrawala, message loss can break **liveness** (progress) while preserving **safety**. This is intentional and used as a teaching point (e.g., “waiting for REPLY from …”).
+
+---
+
+## Quick start (local)
+
+From the repository root:
+
+```bash
+python -m http.server 5500
 ```
 
-## Notes
-- The preview uses a simple circular layout; it is sufficient for small to medium graphs.
-- Self-loops are drawn above the state; multiple symbols between two states are merged with comma-separated labels.
-- No personal data are collected; examples are synthetic.
+Open:
+
+- http://localhost:5500/
+
+Windows users can also run a `.bat` server script if included in the repo.
 
 ---
 
-not part of final artefact
+## How to use (typical)
 
-## Student
-- Name: **Lei Ding**  
-- K number: **K21029011**
+1. Choose an algorithm (Token Ring or Ricart–Agrawala)
+2. Set **Processes** (try 3–8 for readability), click **Apply (reset)**
+3. Use **Request CS** for one or more processes
+4. Click **Step** (or **Run**) to observe token passing or message delivery
+5. Use faults to demonstrate:
+   - Token loss → no progress → regenerate
+   - Crash/recover behaviour
+   - RA message drop → stalled waiting for missing REPLY (liveness failure)
+
+---
+
+## Evidence exports (keeping the repo clean)
+
+The tool supports exporting:
+- **State JSON**
+- **Trace TXT**
+- **Preview PNG**
+- **Evidence bundle** (JSON + trace + PNG)
+
+Generated exports should go into:
+
+- `report/figures/export/`
+
+This folder is **ignored by git** so the repository stays clean.  
+If a figure is referenced in the final report, copy it into:
+
+- `report/figures/`
+
+and reference that curated file instead.
+
+---
+
+## Repository layout
+
+- `index.html` — UI shell
+- `mutex_main.js` — UI wiring, rendering, exports
+- `mutex_core.js` — algorithm models + step logic (Token Ring + RA prototype)
+- `examples/` — scripted demo scenarios (JSON)
+- `eval/` — evaluation materials (e.g., heuristics checklist, test plan)
+- `report/` — report drafts, figures, and curated evidence
+
+---
+
+## Testing (recommended)
+
+### Manual test plan
+See:
+
+- `eval/test_plan.md`
+
+This contains repeatable test cases with expected behaviours (Token Ring safety, token loss/recovery, crash/recover, RA conflict/tiebreak, RA message-loss stall).
+
+### Optional automated smoke tests
+If you add the lightweight Node-based smoke tests:
+
+```bash
+cd ds-mutex
+npm test
+```
+
+(Only include this section if your repo actually contains the `package.json` + test runner.)
+
+---
+
+## Versioning and freeze policy (recommended for dissertation evidence)
+
+- Use tags (e.g., `v0.3.1`) to freeze behaviour and exported evidence.
+- Only do bug fixes after a freeze; avoid feature churn that invalidates report screenshots/traces.
+
+---
+
+## Licence
+
+Add a licence if required by your course / publication method (e.g., MIT). If not, state “All rights reserved” by default.

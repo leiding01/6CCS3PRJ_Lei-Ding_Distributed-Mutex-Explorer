@@ -2,7 +2,16 @@
 Thumbs.db
 .vscode/
 *.zip
-# DS-Mutex: generated exports (evidence snapshots)
-ds-mutex/report/figures/export/**
-!ds-mutex/report/figures/export/README.md
-!ds-mutex/report/figures/export/.gitkeep
+
+# Generated evidence exports (do NOT commit)
+report/figures/export/**
+!report/figures/export/README.md
+!report/figures/export/.gitkeep
+
+# Optional: keep recordings out of git
+*.mp4
+*.mov
+
+# Optional: if you later add JS smoke tests
+node_modules/
+npm-debug.log*

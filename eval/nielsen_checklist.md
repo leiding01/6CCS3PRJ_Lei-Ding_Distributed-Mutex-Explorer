@@ -16,7 +16,7 @@ This checklist covers the Token Ring explorer UI:
 - JSON export/import and scripted scenario loading
 
 ## Evidence
-Add screenshots to `ds-mutex/report/figures/` and reference them here:
+Add screenshots to `report/figures/` and reference them here:
 - `report/figures/mutex_v0.2_overview.png` (main UI)
 - `report/figures/mutex_v0.2_crash.png` (crash state)
 - `report/figures/mutex_v0.2_token_lost.png` (token lost warning)

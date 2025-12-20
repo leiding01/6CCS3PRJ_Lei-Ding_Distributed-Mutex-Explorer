@@ -129,4 +129,4 @@ npm test
 
 ## Licence
 
-Add a licence if required by your course / publication method (e.g., MIT). If not, state “All rights reserved” by default.
+All rights reserved.

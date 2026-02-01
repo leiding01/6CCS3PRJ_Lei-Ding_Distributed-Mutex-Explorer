@@ -28,9 +28,9 @@ import {
   exportStateObject,
 } from './mutex_core.js';
 
-// ----------------------------
+
 // DOM helpers
-// ----------------------------
+
 const $ = (id) => {
   const el = document.getElementById(id);
   if (!el) throw new Error(`Missing element: #${id}`);
@@ -77,9 +77,9 @@ const els = {
   exportPngBtn: $('exportPngBtn'),
 };
 
-// ----------------------------
+
 // State
-// ----------------------------
+
 
 let model = makeTokenRingModel(4);
 let runTimer = null;
@@ -199,9 +199,9 @@ function setMode(mode) {
   els.exitScriptBtn.disabled = mode !== 'script';
 }
 
-// ----------------------------
+
 // Import / Export
-// ----------------------------
+
 
 function exportState() {
   const base = nextExportBaseName();
@@ -241,9 +241,9 @@ function importJsonObject(obj) {
   render();
 }
 
-// ----------------------------
+
 // Rendering
-// ----------------------------
+
 
 function statusLabel(p) {
   if (p.crashed && p.inCS) return 'crashed (in CS)';
@@ -561,9 +561,9 @@ function render() {
   drawPreview();
 }
 
-// ----------------------------
+
 // Step
-// ----------------------------
+
 
 function stepAndRender() {
   const r = stepCore(model);
@@ -571,9 +571,9 @@ function stepAndRender() {
   return r;
 }
 
-// ----------------------------
+
 // Event wiring
-// ----------------------------
+
 
 els.applyConfigBtn.addEventListener('click', () => {
   resetSimulation(Number(els.procCount.value), els.algorithmSelect.value);

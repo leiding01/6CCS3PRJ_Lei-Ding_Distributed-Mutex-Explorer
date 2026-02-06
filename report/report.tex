@@ -1,0 +1,35 @@
+% report.tex (示意)
+\documentclass{informatics-report}
+
+% packages...
+\usepackage{graphicx}
+\usepackage{booktabs}
+% 建议加：统一 figures 路径
+\graphicspath{{figures/}}
+
+\begin{document}
+
+% title/originality/abstract/contents...（模板可能已有）
+
+\tableofcontents
+
+% ===== Chapters =====
+\include{Chapters/01_introduction}
+\include{Chapters/02_background}
+\include{Chapters/03_design}
+\include{Chapters/04_implementation}
+\include{Chapters/05_testing}
+\include{Chapters/06_evaluation}
+\include{Chapters/07_conclusion}
+
+% ===== Bibliography =====
+% 这里取决于你模板用 bibtex 还是 biblatex（见下一节）
+\bibliographystyle{...}
+\bibliography{references}
+
+% ===== Appendices =====
+\appendix
+\include{Appendices/A_user_manual}
+\include{Appendices/B_test_cases}
+
+\end{document}

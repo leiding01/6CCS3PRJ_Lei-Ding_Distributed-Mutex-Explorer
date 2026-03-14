@@ -1,0 +1,8 @@
+Distributed Mutual Exclusion Explorer
+Algorithm: TokenRing
+Mode: interactive
+Export session: 2026-03-14T14-34-04-684Z
+Export time: 2026-03-14T14:34:38.527Z
+[001]! Fault injected: token lost.
+[002]! No progress: token is lost.
+[003]! No progress: token is lost.

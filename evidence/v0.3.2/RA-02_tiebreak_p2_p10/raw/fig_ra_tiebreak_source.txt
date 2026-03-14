@@ -1,8 +1,8 @@
 Distributed Mutual Exclusion Explorer
 Algorithm: RA
 Mode: script
-Export session: 2026-02-01T22-16-22-140Z
-Export time: 2026-02-01T22:17:20.362Z
+Export session: 2026-03-14T14-29-57-662Z
+Export time: 2026-03-14T14:30:20.798Z
 [001]  Loaded scripted scenario: Both request at the same logical time. Correct tie-break is numeric PID: P2 should enter CS before P10..
 [002]  P2 broadcasts REQUEST(ts=1) to 1 processes.
 [003]  P10 broadcasts REQUEST(ts=1) to 1 processes.
@@ -10,9 +10,3 @@ Export time: 2026-02-01T22:17:20.362Z
 [005]  P2 defers REPLY to P10.
 [006]  P2 receives REPLY from P10 (0 remaining).
 [007]  P2 enters the critical section (all REPLY received).
-[008]  P2 releases the critical section.
-[009]  P2 sends deferred REPLY to P10.
-[010]  P10 receives REPLY from P2 (0 remaining).
-[011]  P10 enters the critical section (all REPLY received).
-[012]  P10 releases the critical section.
-[013]  Script finished.

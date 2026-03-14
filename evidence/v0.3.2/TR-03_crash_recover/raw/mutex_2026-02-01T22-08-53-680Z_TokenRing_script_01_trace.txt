@@ -1,6 +1,0 @@
-Distributed Mutual Exclusion Explorer
-Algorithm: TokenRing
-Mode: script
-Export session: 2026-02-01T22-08-53-680Z
-Export time: 2026-02-01T22:09:12.782Z
-[001]  Loaded scripted scenario: Demonstrates a token-holder crash while in the critical section, followed by process recovery and token regeneration, then normal progress resumes..

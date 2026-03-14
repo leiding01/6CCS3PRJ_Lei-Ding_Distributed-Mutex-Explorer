@@ -1,0 +1,12 @@
+Distributed Mutual Exclusion Explorer
+Algorithm: TokenRing
+Mode: script
+Export session: 2026-03-14T14-32-51-273Z
+Export time: 2026-03-14T14:33:19.927Z
+[001]  Loaded scripted scenario: Demonstrates a token-holder crash while in the critical section, followed by process recovery and token regeneration, then normal progress resumes..
+[002]  Token placed at P1.
+[003]  P1 requests the critical section.
+[004]  P1 enters the critical section (holds token).
+[005]! Fault injected: P1 crashed.
+[006]! Progress blocked: P1 crashed in the critical section; token is lost.
+[007]! Recovery: P1 recovered (state reset; exited critical section).

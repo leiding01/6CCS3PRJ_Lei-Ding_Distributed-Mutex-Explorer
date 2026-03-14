@@ -6,21 +6,25 @@
     {
       "id": "P2",
       "requesting": false,
-      "inCS": false,
+      "inCS": true,
       "crashed": false,
-      "clock": 5,
-      "reqTs": null,
+      "clock": 4,
+      "reqTs": 1,
       "awaiting": [],
-      "deferred": []
+      "deferred": [
+        "P10"
+      ]
     },
     {
       "id": "P10",
-      "requesting": false,
+      "requesting": true,
       "inCS": false,
       "crashed": false,
-      "clock": 6,
-      "reqTs": null,
-      "awaiting": [],
+      "clock": 3,
+      "reqTs": 1,
+      "awaiting": [
+        "P2"
+      ],
       "deferred": []
     }
   ],
@@ -29,17 +33,17 @@
     "P10"
   ],
   "network": {
-    "nextMsgId": 5,
+    "nextMsgId": 4,
     "dropNextSend": false,
     "queue": []
   },
   "derived": {
-    "inCS": null,
+    "inCS": "P2",
     "metrics": {
-      "csEntries": 2,
-      "csReleases": 2,
-      "messagesSent": 4,
-      "messagesDelivered": 4,
+      "csEntries": 1,
+      "csReleases": 0,
+      "messagesSent": 3,
+      "messagesDelivered": 3,
       "messagesDropped": 0
     }
   }

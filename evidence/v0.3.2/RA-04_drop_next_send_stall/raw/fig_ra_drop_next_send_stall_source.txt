@@ -1,8 +1,8 @@
 Distributed Mutual Exclusion Explorer
 Algorithm: RA
 Mode: interactive
-Export session: 2026-02-01T22-19-23-377Z
-Export time: 2026-02-01T22:19:57.779Z
+Export session: 2026-03-14T14-37-27-886Z
+Export time: 2026-03-14T14:39:07.535Z
 [001]! Fault armed: next outgoing message will be dropped.
 [002]! Fault injected: dropped outgoing REQUEST #1 P1 -> P2.
 [003]  P1 broadcasts REQUEST(ts=1) to 3 processes.
@@ -12,3 +12,4 @@ Export time: 2026-02-01T22:19:57.779Z
 [007]  P1 receives REPLY from P4 (1 remaining).
 [008]! Stalled: P1 is waiting for REPLY from P2.
 [009]! Stalled: P1 is waiting for REPLY from P2.
+[010]! Stalled: P1 is waiting for REPLY from P2.

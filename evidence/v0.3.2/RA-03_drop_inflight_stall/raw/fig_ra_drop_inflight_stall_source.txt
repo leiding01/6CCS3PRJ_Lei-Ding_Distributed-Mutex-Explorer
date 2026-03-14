@@ -1,8 +1,8 @@
 Distributed Mutual Exclusion Explorer
 Algorithm: RA
 Mode: interactive
-Export session: 2026-02-01T22-18-02-161Z
-Export time: 2026-02-01T22:19:02.286Z
+Export session: 2026-03-14T14-25-16-346Z
+Export time: 2026-03-14T14:27:20.992Z
 [001]  P1 broadcasts REQUEST(ts=1) to 3 processes.
 [002]  P2 sends REPLY to P1.
 [003]  P3 sends REPLY to P1.

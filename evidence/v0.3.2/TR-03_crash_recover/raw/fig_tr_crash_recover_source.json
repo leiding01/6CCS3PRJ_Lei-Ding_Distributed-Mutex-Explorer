@@ -6,12 +6,12 @@
     {
       "id": "P1",
       "requesting": false,
-      "inCS": true,
+      "inCS": false,
       "crashed": false
     },
     {
       "id": "P2",
-      "requesting": true,
+      "requesting": false,
       "inCS": false,
       "crashed": false
     },
@@ -36,10 +36,10 @@
   ],
   "token": {
     "holder": "P1",
-    "lost": false
+    "lost": true
   },
   "derived": {
-    "inCS": "P1",
+    "inCS": null,
     "metrics": {
       "tokenPasses": 0,
       "csEntries": 1,

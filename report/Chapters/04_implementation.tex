@@ -1,0 +1,177 @@
+\chapter{Implementation}
+\label{ch:implementation}
+
+\section{Implementation Goals}
+The delivered artefact is a dependency-free browser application designed for interactive exploration of distributed mutual exclusion. The implementation prioritises correctness (especially the safety invariant), pedagogical clarity, and reproducibility. Two representative approaches are implemented:
+\begin{itemize}
+  \item a token-based \textbf{Token Ring} model;
+  \item a message-based \textbf{Ricart--Agrawala (RA)} teaching-oriented prototype \cite{ricart1981optimal,lamport1978time}.
+\end{itemize}
+
+\section{Repository Structure and Responsibilities}
+The codebase is organised around a small number of responsibilities:
+\begin{itemize}
+  \item \texttt{index.html}: page layout and controls.
+  \item \texttt{styles.css}: minimal CSS for layout and readability.
+  \item \texttt{mutex\_core.js}: algorithm models, state transitions, safety checking, script replay, import/export.
+  \item \texttt{mutex\_main.js}: DOM wiring, rendering, preview drawing, evidence export, and interaction logic.
+  \item \texttt{examples/}: scripted JSON scenarios.
+  \item \texttt{tools/smoke\_tests.mjs}: dependency-free automated smoke tests.
+\end{itemize}
+
+This separation keeps the simulation engine testable without a browser and prevents UI changes from implicitly changing algorithm behaviour \cite{gamma1994design}.
+
+\section{Core Data Structures}
+A single \texttt{model} object captures the current simulator state. It stores:
+\begin{itemize}
+  \item the selected algorithm and current mode,
+  \item the list of processes,
+  \item algorithm-specific state (token information or message queue),
+  \item a step-numbered trace,
+  \item and lightweight metrics.
+\end{itemize}
+
+\subsection{Process State}
+Each process includes:
+\begin{itemize}
+  \item \texttt{id}
+  \item \texttt{requesting}
+  \item \texttt{inCS}
+  \item \texttt{crashed}
+\end{itemize}
+
+For RA, additional fields include:
+\begin{itemize}
+  \item \texttt{clock}
+  \item \texttt{reqTs}
+  \item \texttt{awaiting}
+  \item \texttt{deferred}
+\end{itemize}
+
+\subsection{Token Ring State}
+Token Ring uses:
+\begin{itemize}
+  \item \texttt{ring}
+  \item \texttt{token.holder}
+  \item \texttt{token.lost}
+\end{itemize}
+
+\subsection{RA Network State}
+The RA prototype uses:
+\begin{itemize}
+  \item \texttt{network.queue}
+  \item \texttt{network.nextMsgId}
+  \item \texttt{network.dropNextSend}
+\end{itemize}
+
+\subsection{Trace and Metrics}
+A step-numbered trace records user actions, algorithm events, warnings, and stall explanations. Metrics record token passes, CS entries, releases, and for RA the number of messages sent, delivered, and dropped.
+
+\section{Safety Checking}
+The safety property is encoded directly in the core module through a dedicated checker. The invariant is:
+\begin{quote}
+At most one process may be in the critical section at any time.
+\end{quote}
+The UI exposes this as a Safety indicator, making the invariant visible during every scenario.
+
+\section{Step Engine}
+A core design feature is the \textbf{step engine}. Each press of \texttt{Step} performs one minimal unit of progress.
+
+\subsection{Token Ring Step Semantics}
+A Token Ring step follows this decision order:
+\begin{enumerate}
+  \item If the token is lost, report that progress cannot continue.
+  \item If a process is already in the critical section, report that release is required.
+  \item If the token holder is requesting, allow entry to the critical section.
+  \item Otherwise, pass the token to the next process in ring order.
+\end{enumerate}
+
+\subsection{RA Step Semantics}
+An RA step follows this decision order:
+\begin{enumerate}
+  \item If the network queue is non-empty, deliver exactly one queued message.
+  \item If the queue is empty but a process is still awaiting replies, emit a stall explanation.
+  \item Otherwise, report that no messages are in flight.
+\end{enumerate}
+
+\section{Token Ring Implementation}
+Token Ring provides mutual exclusion through token ownership. A process requests the critical section by setting \texttt{requesting = true}. If the token holder is requesting and no process is already in the critical section, it enters.
+
+\subsection{Token Faults and Recovery}
+Token Ring supports:
+\begin{itemize}
+  \item \textbf{Drop token}: sets \texttt{token.lost = true}, halting progress.
+  \item \textbf{Regenerate token}: restores the token.
+  \item \textbf{Crash / recover}: makes a process unavailable and later returns it to participation.
+\end{itemize}
+
+\section{Ricart--Agrawala Implementation}
+In the RA prototype, a requesting process:
+\begin{enumerate}
+  \item increments its logical clock,
+  \item stores the request timestamp,
+  \item initialises its outstanding reply set,
+  \item and enqueues REQUEST messages to all peers.
+\end{enumerate}
+
+When a REQUEST is delivered, the receiver either:
+\begin{itemize}
+  \item replies immediately, or
+  \item defers reply if it is already in the critical section or has priority.
+\end{itemize}
+
+Entry occurs only after all required REPLY messages are received.
+
+\subsection{Tie-break Logic}
+When requests share the same timestamp, the implementation resolves the tie using numeric process IDs, ensuring deterministic and reproducible behaviour.
+
+\section{Fault Injection Points}
+The fault controls are implemented in the simulation engine.
+
+\subsection{Token Ring}
+\begin{itemize}
+  \item \texttt{dropToken(model)}
+  \item \texttt{regenerateToken(model)}
+  \item \texttt{crashProcess(model, pid)}
+  \item \texttt{recoverProcess(model, pid)}
+\end{itemize}
+
+\subsection{Ricart--Agrawala}
+\begin{itemize}
+  \item \texttt{dropNextMessage(model)}
+  \item \texttt{toggleDropNextSend(model)}
+  \item crash/recover controls
+\end{itemize}
+
+\section{Stall Explanation Logic}
+A key clarity feature is explicit stalled-state explanation. In RA, if the queue is empty but a process still awaits replies, the simulator emits a trace message indicating which REPLY is missing. This prevents learners from misinterpreting ``queue empty'' as successful completion.
+
+\section{Scripted Scenarios}
+Scripted scenarios are stored as JSON files and replayed via the same step engine used in interactive mode. This supports repeatable demonstrations and reproducible evidence capture.
+
+\section{Export Pipeline}
+The tool exports:
+\begin{itemize}
+  \item state JSON,
+  \item trace TXT,
+  \item preview PNG.
+\end{itemize}
+
+The export naming strategy combines a timestamp-based session identifier, algorithm/mode metadata, and a sequence number, producing stable and traceable evidence artefacts.
+
+\section{Implementation Limitations}
+The implementation intentionally simplifies some aspects:
+\begin{itemize}
+  \item the RA network is modelled as a FIFO queue,
+  \item no retransmission or failure detector is implemented,
+  \item the visual design prioritises clarity over animation.
+\end{itemize}
+
+\IfFileExists{figures/fig_ui_overview.png}{
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\linewidth]{fig_ui_overview.png}
+\caption{Main user interface of the Distributed Mutual Exclusion Explorer.}
+\label{fig:ui-overview}
+\end{figure}
+}{}

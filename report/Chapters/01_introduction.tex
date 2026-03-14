@@ -1,0 +1,49 @@
+\chapter{Introduction}
+\label{ch:introduction}
+
+\section{Motivation}
+Distributed systems underpin modern computing, but their behaviour is often difficult to understand from static material because correctness depends on concurrency, message ordering, and assumptions about failures \cite{tanenbaum2017distributed,coulouris2011distributed,lynch1996distributed}. Mutual exclusion is a classic example: a set of distributed processes must coordinate access to a shared critical section without relying on shared memory or a global clock.
+
+Learners commonly struggle to connect algorithm descriptions to concrete executions. This challenge becomes more severe when faults are introduced, since safety properties may remain intact even when progress is lost. Such distinctions are difficult to communicate through static diagrams alone. This motivates the development of an interactive teaching tool that makes state, causality, and fault consequences directly observable.
+
+\section{Project Aim and Objectives}
+The aim of this project is to develop an interactive educational artefact for visualising distributed mutual exclusion and its behaviour under faults and recovery conditions.
+
+The specific objectives are:
+\begin{itemize}
+  \item implement a technically correct simulation that preserves the safety invariant of mutual exclusion,
+  \item provide step-by-step execution with an explanatory trace,
+  \item support representative token-based and message-based algorithms,
+  \item support fault injection and recovery to illustrate safety vs liveness trade-offs,
+  \item provide reproducible evidence export,
+  \item and evaluate the artefact in terms of correctness, usability, and reproducibility.
+\end{itemize}
+
+\section{Scope}
+The delivered system focuses on two representative approaches:
+\begin{itemize}
+  \item \textbf{Token Ring}, a token-based mechanism that provides an intuitive model of exclusivity.
+  \item \textbf{Ricart--Agrawala (RA)}, a message-based algorithm using Lamport-style timestamps \cite{ricart1981optimal,lamport1978time}.
+\end{itemize}
+
+The system is teaching-oriented rather than production-oriented. The network model is intentionally simplified to support controlled observation and reproducibility. Message loss in RA is used to demonstrate that liveness can fail while safety is preserved; retransmission and failure detectors are not implemented.
+
+\section{Contributions}
+The main contributions of the project are:
+\begin{itemize}
+  \item a browser-based, dependency-free Distributed Mutual Exclusion Explorer,
+  \item support for both Token Ring and an RA teaching-oriented prototype,
+  \item explicit fault injection and recovery mechanisms,
+  \item scripted demos for deterministic replay,
+  \item an evidence export pipeline (state JSON, trace TXT, preview PNG),
+  \item and a reproducible testing and evidence framework built around a freeze baseline.
+\end{itemize}
+
+\section{Report Structure}
+Chapter~\ref{ch:background} reviews distributed mutual exclusion, logical time, fault assumptions, and educational visualisation literature.
+Chapter~\ref{ch:design} presents the specification and design of the artefact.
+Chapter~\ref{ch:implementation} describes implementation details.
+Chapter~\ref{ch:testing} covers testing strategy and execution.
+Chapter~\ref{ch:evaluation} evaluates correctness, usability, and reproducibility.
+Chapter~\ref{ch:professional} discusses professional issues.
+Chapter~\ref{ch:conclusion} concludes the report and outlines future work.

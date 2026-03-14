@@ -1,0 +1,39 @@
+\chapter{User Manual}
+\label{app:user-manual}
+
+\section{Running the Tool Locally}
+From the repository root, start a local server:
+\begin{verbatim}
+python -m http.server 5500
+\end{verbatim}
+Open:
+\begin{verbatim}
+http://localhost:5500/
+\end{verbatim}
+
+\section{Basic Usage}
+\begin{itemize}
+  \item Select an algorithm (Token Ring or RA) and choose the number of processes.
+  \item Use \textbf{Request CS} to issue a request.
+  \item Use \textbf{Step} to progress deterministically.
+  \item Use \textbf{Run/Pause} for automated playback.
+  \item Observe the process table, message queue table, trace, safety label, and preview canvas.
+\end{itemize}
+
+\section{Fault Injection}
+\begin{itemize}
+  \item Token Ring: use \textbf{Drop token}, \textbf{Regenerate token}, \textbf{Crash}, and \textbf{Recover}.
+  \item RA: use \textbf{Drop next in-flight msg} and \textbf{Arm drop-next-send}.
+\end{itemize}
+
+\section{Scripted Demos}
+Use the scripted demo controls to load deterministic scenarios such as crash/recover and RA tie-break demonstrations.
+
+\section{Evidence Export}
+Use the export controls to generate:
+\begin{itemize}
+  \item state JSON,
+  \item trace TXT,
+  \item preview PNG.
+\end{itemize}
+These artefacts support reproducible evidence collection.

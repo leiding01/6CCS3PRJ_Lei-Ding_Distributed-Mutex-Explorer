@@ -1,0 +1,96 @@
+\chapter{Background and Related Work}
+\label{ch:background}
+
+\section{Distributed Mutual Exclusion}
+Distributed mutual exclusion requires a set of processes to coordinate access to a critical section using message passing rather than shared memory. Two correctness dimensions are central:
+\begin{itemize}
+  \item \textbf{Safety:} at most one process may enter the critical section at any time.
+  \item \textbf{Liveness:} requesting processes should eventually make progress under suitable assumptions.
+\end{itemize}
+This safety--liveness distinction is fundamental in distributed systems and forms the theoretical basis of this project \cite{lynch1996distributed,attiya2004distributed,tel2000introduction}.
+
+Mutual exclusion algorithms can be grouped into message-based, token-based, and hierarchical or tree-based families. Each family makes different assumptions and offers different teaching affordances. This project intentionally implements one token-based approach and one message-based approach in order to provide contrast rather than breadth.
+
+\section{Message-Based and Token-Based Approaches}
+Message-based algorithms coordinate access through explicit REQUEST/REPLY exchanges. Ricart--Agrawala (RA) is one of the classical examples, requiring each requesting process to receive permission from all peers before entering the critical section \cite{ricart1981optimal}. Maekawa's algorithm reduces the number of messages through quorums, but introduces additional conceptual complexity in explaining quorum intersections and deadlock handling \cite{maekawa1985sqrt}.
+
+Token-based algorithms instead rely on possession of a unique token. This makes the safety mechanism conceptually simple: a process may enter the critical section only when it holds the token. Suzuki--Kasami is a well-known token-based algorithm for distributed mutual exclusion \cite{suzuki1985distributed}, while ring-based token circulation offers an even simpler mental model for teaching. Tree-based approaches such as Raymond's algorithm provide a more efficient structure but are harder to explain clearly to learners encountering the topic for the first time \cite{raymond1989tree}.
+
+Table~\ref{tab:algorithm-comparison} summarises the main approaches relevant to this project.
+
+\begin{table}[htbp]
+\centering
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{p{0.18\linewidth} p{0.18\linewidth} p{0.22\linewidth} p{0.30\linewidth}}
+\toprule
+\textbf{Approach} & \textbf{Representative algorithm} & \textbf{Coordination style} & \textbf{Teaching suitability / relevance here} \\
+\midrule
+Token-based & Token Ring / Suzuki--Kasami & Exclusive token ownership & Strong for introducing safety and simple progress reasoning; well suited to visualising token circulation and recovery \cite{suzuki1985distributed}. \\
+Message-based & Ricart--Agrawala & REQUEST/REPLY to all peers & Strong for illustrating ordering, permission dependencies, and safety vs liveness under message loss \cite{ricart1981optimal}. \\
+Quorum-based & Maekawa & Requests to voting subsets & Interesting but less suitable here because quorum logic adds conceptual overhead \cite{maekawa1985sqrt}. \\
+Tree-based & Raymond & Directed token routing in a tree & Useful for advanced comparison, but structurally more complex than needed for a teaching-first prototype \cite{raymond1989tree}. \\
+\bottomrule
+\end{tabular}
+\caption{Comparison of mutual exclusion algorithm styles relevant to this project.}
+\label{tab:algorithm-comparison}
+\end{table}
+
+This comparison also explains the algorithm choices made in the artefact. Token Ring was selected because its exclusivity mechanism is visually and conceptually direct. Ricart--Agrawala was selected because it exposes message ordering, reply dependencies, and the distinction between safety and liveness particularly clearly. Other approaches such as Maekawa and Raymond are valuable, but were not implemented because the project prioritises teaching clarity over algorithmic breadth.
+
+\section{Logical Time and Ordering}
+In distributed systems there is no global clock that can be relied upon for event ordering. Lamport's logical clocks provide a way to establish a partial order of events through message causality \cite{lamport1978time}. This idea is essential for message-based coordination algorithms, because processes must decide whether to reply immediately or defer a reply according to the relative priority of requests.
+
+For teaching purposes, logical time is one of the most abstract parts of distributed systems. A visual tool can make this more concrete by showing:
+\begin{itemize}
+  \item when a request is broadcast,
+  \item when a reply is received,
+  \item and how ties are resolved deterministically.
+\end{itemize}
+
+This is one reason Ricart--Agrawala is particularly suitable for an educational artefact: its behaviour depends directly on ordering rules that can be surfaced step-by-step.
+
+\section{Failures, Assumptions, and the Safety--Liveness Distinction}
+Distributed algorithms cannot be evaluated independently of their assumptions. Message loss, crash failures, and timing uncertainty can all alter whether a requesting process eventually enters the critical section. More broadly, classical results such as FLP demonstrate that guarantees depend strongly on the failure and timing model \cite{fischer1985impossibility}. In practice, crash failures and message loss may preserve safety while breaking liveness unless the system provides additional recovery mechanisms such as retransmission, failure detectors, or stronger synchrony assumptions \cite{chandra1996failure}.
+
+This point is particularly important pedagogically. Students often interpret ``the algorithm did not complete'' as ``the implementation is wrong'', when in fact the correct conclusion may be that the assumptions needed for liveness were violated. The present project uses explicit fault controls and trace explanations so that this distinction becomes visible.
+
+\section{Educational Visualisation and Interactive Learning}
+Research on algorithm visualisation shows that animation alone does not guarantee learning; effectiveness depends on interaction, engagement, and the learner's opportunity to interpret what is being shown \cite{naps2002engagement,hundhausen2002meta}. Reviews of educational visualisation further suggest that visual tools are most useful when they make hidden state visible and support structured observation rather than passive viewing \cite{shaffer2010algoviz,sorva2013visual,tversky2002animation}.
+
+The artefact in this project follows those principles in four ways:
+\begin{itemize}
+  \item execution is step-based rather than opaque;
+  \item hidden algorithm state is externalised in a trace and tables;
+  \item fault injection allows learners to test assumptions directly;
+  \item scripted scenarios make demonstrations repeatable for discussion and reflection.
+\end{itemize}
+
+\section{Cognitive Load, Usability, and Tool Design}
+Complex distributed behaviour can impose substantial intrinsic cognitive load. Cognitive load theory argues that instructional tools should minimise extraneous complexity while supporting schema formation \cite{sweller1988cogload}. Multimedia learning principles also emphasise that explanations and representations should be aligned with learner needs \cite{mayer2009multimedia}. In addition, minimally guided interfaces can be unhelpful for novices unless appropriate scaffolding is present \cite{kirschner2006minimal}.
+
+These ideas motivate several design choices in this project:
+\begin{itemize}
+  \item a deterministic step engine,
+  \item concise trace messages,
+  \item explicit stalled-state explanations,
+  \item and grouped controls that separate algorithm choice, fault injection, and export functions.
+\end{itemize}
+
+Usability is later evaluated using Nielsen's heuristic framework \cite{nielsen1994usability} and contextualised using ISO 9241-11 \cite{iso9241_11_2018}.
+
+\section{Reproducibility and Research Software Practice}
+Reproducibility is increasingly recognised as a requirement in computational research \cite{sandve2013ten,wilson2014best,wilkinson2016fair}. This includes versioned baselines, explicit execution steps, and evidence that links claims to raw artefacts. In educational tools, reproducibility also has a pedagogical dimension: students should be able to replay the same scenario and observe the same behaviour.
+
+This project therefore treats reproducibility as part of the artefact itself, rather than as an afterthought. Scripted demos, evidence exports, indexed evidence sets, and CI-backed smoke tests all support this aim.
+
+\section{Gap and Positioning}
+Existing distributed systems textbooks and algorithm papers explain mutual exclusion algorithms and their theoretical properties well \cite{tanenbaum2017distributed,coulouris2011distributed,lynch1996distributed,ricart1981optimal,suzuki1985distributed}. Existing visualisation and learning literature explains why interactive tools can support understanding \cite{naps2002engagement,hundhausen2002meta,sorva2013visual}. However, there is a gap between these two bodies of work: there is comparatively little lightweight, browser-based tooling that simultaneously emphasises:
+\begin{itemize}
+  \item distributed mutual exclusion as a focused topic,
+  \item explicit fault and recovery scenarios,
+  \item traceable evidence export for reproducibility,
+  \item and a direct teaching of the distinction between safety and liveness.
+\end{itemize}
+
+The present project is positioned to address that gap. It does not claim to invent a new algorithm. Instead, its contribution lies in combining representative algorithms, controlled fault injection, scripted reproducibility, and explanation-oriented feedback in a single teaching artefact.

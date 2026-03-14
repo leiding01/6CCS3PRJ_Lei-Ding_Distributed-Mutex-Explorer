@@ -1,0 +1,21 @@
+\chapter{Test Cases Summary}
+\label{app:test-cases}
+
+This appendix summarises the minimum manual test set executed for the freeze baseline.
+
+\section{Token Ring}
+\begin{itemize}
+  \item \textbf{TR-01 Basic mutual exclusion:} issue requests from multiple processes and verify that only one process enters the critical section at a time.
+  \item \textbf{TR-02 Token loss and regeneration:} drop the token, observe loss of progress, regenerate the token, and verify recovery.
+  \item \textbf{TR-03 Crash and recover:} crash a process, observe state and trace changes, then recover the process.
+\end{itemize}
+
+\section{Ricart--Agrawala}
+\begin{itemize}
+  \item \textbf{RA-01 Basic request/entry/release:} request the critical section and step through REQUEST/REPLY delivery until entry.
+  \item \textbf{RA-02 Tie-break:} load the scripted tie-break scenario and verify deterministic ordering under equal timestamps.
+  \item \textbf{RA-03 Drop next in-flight message:} drop a queued message and observe the stalled state with explicit missing-REPLY explanation.
+  \item \textbf{RA-04 Drop-next-send:} arm the send-side drop and observe the resulting stalled state.
+\end{itemize}
+
+For each case, an evidence triplet (state JSON, trace TXT, preview PNG) is exported and indexed separately.

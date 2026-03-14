@@ -1,0 +1,102 @@
+\documentclass{informatics-report}
+
+\graphicspath{{figures/}}
+
+% ------------------------------------------------------------
+% Metadata
+% ------------------------------------------------------------
+\newcommand{\ProjectTitle}{Distributed Mutual Exclusion Explorer}
+\newcommand{\ProjectSubtitle}{Interactive Tools for Learning Distributed Systems Concepts (Variant 3)}
+\newcommand{\StudentName}{Lei Ding}
+\newcommand{\StudentID}{K21029011}
+\newcommand{\ProgrammeName}{BSc Computer Science}
+\newcommand{\SupervisorName}{Angelos Georgoulas}
+\newcommand{\DepartmentName}{Department of Informatics, King's College London}
+
+\begin{document}
+
+% ------------------------------------------------------------
+% Title page
+% ------------------------------------------------------------
+\begin{titlepage}
+\centering
+\vspace*{2.2cm}
+
+{\color{deepblue}\bfseries\LARGE \ProjectTitle\par}
+\vspace{0.6cm}
+{\Large \ProjectSubtitle\par}
+
+\vspace{2.0cm}
+
+{\large \textbf{Author:} \StudentName\par}
+\vspace{0.2cm}
+{\large \textbf{Student ID:} \StudentID\par}
+\vspace{0.2cm}
+{\large \textbf{Programme:} \ProgrammeName\par}
+
+\vspace{1.0cm}
+
+{\large \textbf{Supervisor:} \SupervisorName\par}
+\vspace{0.2cm}
+{\large \DepartmentName\par}
+
+\vfill
+
+{\large \today\par}
+\end{titlepage}
+
+% ------------------------------------------------------------
+% Front matter
+% ------------------------------------------------------------
+\pagenumbering{roman}
+
+\chapter*{Originality Avowal}
+\addcontentsline{toc}{chapter}{Originality Avowal}
+This report is submitted as part of the requirements for the Final Year Individual Project.
+It is the result of the author's own work except where explicitly indicated in the text.
+All sources are acknowledged by appropriate references.
+This report has not been submitted for any other assessment at this or any other institution.
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+Distributed mutual exclusion is a foundational distributed systems problem, yet its behaviour is difficult to learn from static descriptions because correctness depends on concurrency, ordering, and failure assumptions. This project delivers a browser-based interactive teaching tool that visualises distributed mutual exclusion using two representative approaches: a token-based Token Ring model and a teaching-oriented Ricart--Agrawala (RA) prototype. The tool supports step-by-step execution, scripted demonstrations, fault injection (token loss, crash/recover, and message loss in RA), and evidence export (state JSON, trace TXT, preview PNG) for reproducible evaluation. Correctness is evaluated primarily via the safety property (mutual exclusion), while fault scenarios are used to illustrate the separation between safety and liveness. Testing combines a manual evidence-driven test plan with dependency-free automated smoke tests executed in continuous integration. The resulting artefact provides an accessible environment for exploring distributed coordination and for producing traceable evaluation evidence.
+
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+The author would like to thank the project supervisor for guidance and feedback throughout the project.
+
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+\listoftables
+\clearpage
+
+\pagenumbering{arabic}
+
+% ------------------------------------------------------------
+% Chapters
+% ------------------------------------------------------------
+\IfFileExists{Chapters/01_introduction.tex}{\input{Chapters/01_introduction}}{}
+\IfFileExists{Chapters/02_background.tex}{\input{Chapters/02_background}}{}
+\IfFileExists{Chapters/03_design.tex}{\input{Chapters/03_design}}{}
+\IfFileExists{Chapters/04_implementation.tex}{\input{Chapters/04_implementation}}{}
+\IfFileExists{Chapters/05_testing.tex}{\input{Chapters/05_testing}}{}
+\IfFileExists{Chapters/06_evaluation.tex}{\input{Chapters/06_evaluation}}{}
+\IfFileExists{Chapters/07_professional_issues.tex}{\input{Chapters/07_professional_issues}}{}
+\IfFileExists{Chapters/08_conclusion.tex}{\input{Chapters/08_conclusion}}{}
+
+% ------------------------------------------------------------
+% Bibliography
+% ------------------------------------------------------------
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+% ------------------------------------------------------------
+% Appendices
+% ------------------------------------------------------------
+\appendix
+\IfFileExists{Appendices/A_user_manual.tex}{\input{Appendices/A_user_manual}}{}
+\IfFileExists{Appendices/B_test_cases.tex}{\input{Appendices/B_test_cases}}{}
+
+\end{document}

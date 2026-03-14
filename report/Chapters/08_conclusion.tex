@@ -1,0 +1,93 @@
+\chapter{Conclusion and Future Work}
+\label{ch:conclusion}
+
+\section{Conclusion}
+This project set out to develop an interactive educational artefact for learning distributed mutual exclusion. The resulting system, the \emph{Distributed Mutual Exclusion Explorer}, provides a browser-based environment in which learners can observe and manipulate two representative coordination approaches:
+\begin{itemize}
+  \item a token-based Token Ring model,
+  \item and a message-based Ricart--Agrawala (RA) teaching-oriented prototype.
+\end{itemize}
+
+The central achievement of the project is not the invention of a new algorithm, but the creation of a tool that makes the behaviour of distributed mutual exclusion visible, explainable, and reproducible. In particular, the artefact supports:
+\begin{itemize}
+  \item step-by-step execution,
+  \item scripted demos,
+  \item fault injection and recovery,
+  \item trace-based explanations,
+  \item and exportable evidence suitable for report-based evaluation.
+\end{itemize}
+
+From a correctness perspective, the project demonstrates the preservation of the mutual exclusion safety invariant across the tested scenarios. From an educational perspective, the artefact is especially strong in making the distinction between \emph{safety} and \emph{liveness} concrete. This is most visible in the RA message-loss cases, where the tool does not simply fail silently, but instead explains why progress has stalled.
+
+The project also makes a contribution at the level of engineering and reproducibility. By combining:
+\begin{itemize}
+  \item a freeze baseline release,
+  \item automated smoke and unit testing,
+  \item evidence triplet export,
+  \item and indexed mappings between figures and evidence,
+\end{itemize}
+the project supports a report workflow in which claims are traceable back to concrete artefacts. This strengthens the credibility of the written evaluation and aligns the project with professional software and research practices.
+
+\section{Achievement Against Objectives}
+The objectives stated in Chapter~\ref{ch:introduction} have been substantially met.
+
+\begin{itemize}
+  \item A technically correct simulation preserving the mutual exclusion safety property was implemented.
+  \item Step-by-step execution and explanatory traces were provided for both algorithms.
+  \item Token-based and message-based mutual exclusion were both represented.
+  \item Fault injection and recovery mechanisms were added and evaluated.
+  \item Reproducible evidence export and indexing were integrated into the workflow.
+  \item Correctness, usability, and reproducibility were evaluated through structured methods.
+\end{itemize}
+
+Taken together, these outcomes mean that the project satisfies the main educational and technical aims of Variant 3.
+
+\section{Main Limitations}
+Several limitations remain and should be recognised explicitly.
+
+First, the RA component is intentionally a \emph{teaching-oriented prototype}. It does not attempt to model all aspects of realistic distributed communication, such as retransmission, timeouts, or failure detectors. Second, the network representation is deliberately simplified into a queue-based model to support visibility and reproducibility. Third, usability was assessed heuristically rather than through a large participant study. Finally, while accessibility has been considered, it has not yet been evaluated systematically.
+
+These limitations do not invalidate the project, but they define its scope and should guide how its contributions are interpreted.
+
+\section{Future Work}
+Several directions for future work follow naturally from the current artefact.
+
+\subsection{Algorithmic Extensions}
+The current system focuses on Token Ring and RA because they provide a strong contrast between token-based and message-based coordination. Future work could add:
+\begin{itemize}
+  \item Suzuki--Kasami for a richer token-based comparison \cite{suzuki1985distributed},
+  \item Maekawa to illustrate quorum-based trade-offs \cite{maekawa1985sqrt},
+  \item or Raymond’s algorithm for a more structured token-routing approach \cite{raymond1989tree}.
+\end{itemize}
+
+\subsection{Fault-Tolerance Extensions}
+For RA in particular, a natural next step would be to add optional recovery-oriented mechanisms such as:
+\begin{itemize}
+  \item timeouts,
+  \item retransmissions,
+  \item or simplified failure-detector logic \cite{chandra1996failure}.
+\end{itemize}
+
+This would allow the tool to contrast \emph{pure algorithmic assumptions} with \emph{fault-tolerant engineering extensions}.
+
+\subsection{Interface and Accessibility Improvements}
+Several usability and accessibility improvements are also realistic:
+\begin{itemize}
+  \item a legend for preview symbols,
+  \item concise in-app algorithm explanations,
+  \item keyboard shortcuts,
+  \item and stronger keyboard/screen-reader support aligned with WCAG and ARIA guidance \cite{w3c_wcag22,w3c_aria12}.
+\end{itemize}
+
+\subsection{User Study and Stronger Educational Validation}
+A future iteration could extend the current heuristic evaluation with a participant-based study. This might include:
+\begin{itemize}
+  \item structured learner tasks,
+  \item pre-/post-task conceptual questions,
+  \item or a lightweight usability instrument such as SUS \cite{brooke1996sus}.
+\end{itemize}
+
+This would strengthen claims about pedagogical effectiveness beyond the current evidence-driven and heuristic framework.
+
+\section{Final Reflection}
+The final outcome of the project is a working and evaluable teaching artefact that makes an abstract area of distributed systems more concrete. It demonstrates that meaningful final-year project work in computing is not limited to building a technically functioning system; it also involves creating something that can be reasoned about, tested, evaluated, and communicated responsibly. In that sense, the project succeeds both as a software artefact and as a piece of engineering-led academic work.

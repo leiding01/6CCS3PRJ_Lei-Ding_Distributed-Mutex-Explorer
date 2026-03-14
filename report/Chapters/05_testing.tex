@@ -1,0 +1,148 @@
+\chapter{Testing}
+\label{ch:testing}
+
+\section{Testing Methodology}
+The testing methodology combines two complementary components:
+\begin{itemize}
+  \item \textbf{Manual evidence-driven tests} validate UI behaviour, scripted scenarios, and fault demonstrations as experienced by a learner.
+  \item \textbf{Automated smoke and unit tests} validate the core simulation engine independently of the browser environment.
+\end{itemize}
+
+Both are necessary because the artefact is interactive. Automated tests are strong for preserving core logic and preventing regressions, whereas manual tests are better suited to validating trace readability, scenario flow, and evidence capture.
+
+\section{Testing Objectives}
+Testing aims to demonstrate that the artefact:
+\begin{enumerate}
+  \item preserves the mutual exclusion safety invariant,
+  \item exhibits intended behaviour under normal conditions,
+  \item demonstrates fault effects and recoveries in a controlled way,
+  \item and produces reproducible evidence for later evaluation.
+\end{enumerate}
+
+\section{Manual Evidence-Driven Testing}
+A structured manual test plan is maintained in \texttt{eval/test\_plan.md}. The minimum executed set for the freeze baseline includes:
+\begin{itemize}
+  \item \textbf{Token Ring:}
+    \begin{itemize}
+      \item TR-01: basic mutual exclusion,
+      \item TR-02: token loss and regeneration,
+      \item TR-03: crash and recover.
+    \end{itemize}
+  \item \textbf{Ricart--Agrawala:}
+    \begin{itemize}
+      \item RA-01: basic request/entry/release,
+      \item RA-02: tie-break under equal timestamps,
+      \item RA-03: drop next in-flight message causing a stalled state,
+      \item RA-04: drop-next-send causing a stalled state.
+    \end{itemize}
+\end{itemize}
+
+Each manual case produces an evidence triplet:
+\begin{itemize}
+  \item state JSON,
+  \item trace TXT,
+  \item preview PNG.
+\end{itemize}
+
+This evidence-first approach supports later evaluation because every behavioural claim can be tied to a stored artefact.
+
+\section{Automated Testing}
+Automated tests are implemented using the Node.js built-in test runner and are executed through:
+\begin{verbatim}
+npm test
+\end{verbatim}
+
+The automated workflow includes:
+\begin{itemize}
+  \item smoke tests for quick regression checks,
+  \item unit tests for the core simulation logic,
+  \item and coverage reporting for the core module.
+\end{itemize}
+
+These tests target \texttt{mutex\_core.js}, which contains the main algorithmic behaviour. This choice is deliberate: the most critical regressions for this project are algorithmic, not cosmetic.
+
+\section{Continuous Integration}
+A GitHub Actions workflow runs the automated suite on each push and pull request. This provides:
+\begin{itemize}
+  \item rapid detection of regressions,
+  \item a clean execution environment,
+  \item and an auditable history of results \cite{chacon2014progit}.
+\end{itemize}
+
+\section{Pass Criteria and Outcome Categories}
+Testing is not limited to binary success/failure. Two result categories are used:
+
+\begin{itemize}
+  \item \textbf{PASS:} the observed behaviour matches the expected correctness or recovery behaviour.
+  \item \textbf{Expected stall:} the artefact intentionally demonstrates a liveness failure under fault assumptions while preserving safety.
+\end{itemize}
+
+This distinction is particularly important for RA-03 and RA-04, where message loss is expected to block progress.
+
+\section{Test Execution Summary}
+Table~\ref{tab:test-summary} summarises the key manual cases and their outcomes.
+
+\begin{table}[htbp]
+\centering
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{p{0.12\linewidth} p{0.14\linewidth} p{0.16\linewidth} p{0.23\linewidth} p{0.12\linewidth} p{0.16\linewidth}}
+\toprule
+\textbf{Case ID} & \textbf{Mode} & \textbf{Fault injected} & \textbf{Pass criterion} & \textbf{Result} & \textbf{Evidence pointer} \\
+\midrule
+TR-01 & interactive & none & At most one process may be in the critical section. & PASS & Evidence case TR-01 \\
+TR-02 & interactive & token loss + regenerate & No progress until regeneration; progress resumes after token regeneration. & PASS & Evidence case TR-02 \\
+TR-03 & scripted / interactive & crash + recover & Crash and recovery are visible; progress resumes after recovery. & PASS & Evidence case TR-03 \\
+RA-01 & interactive & none & Entry occurs only after all required REPLY messages are received. & PASS & Evidence case RA-01 \\
+RA-02 & scripted & none & Deterministic tie-break under equal timestamps. & PASS & Evidence case RA-02 \\
+RA-03 & interactive & drop next in-flight msg & Explicit stall explanation is shown while safety remains preserved. & Expected stall & Evidence case RA-03 \\
+RA-04 & interactive & drop-next-send & Explicit stall explanation is shown while safety remains preserved. & Expected stall & Evidence case RA-04 \\
+\bottomrule
+\end{tabular}
+\caption{Manual test execution summary for the v0.3.2 freeze baseline.}
+\label{tab:test-summary}
+\end{table}
+
+\section{Quantitative Snapshot}
+The testing process also yields quantitative evidence. Table~\ref{tab:quant-snapshot} summarises the automated results and evidence footprint.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{p{0.45\linewidth} p{0.35\linewidth}}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Smoke tests passed & 6 / 6 \\
+Unit tests passed & 31 / 31 \\
+Core line coverage (\texttt{mutex\_core.js}) & 96.28\% \\
+Core branch coverage (\texttt{mutex\_core.js}) & 83.18\% \\
+Core function coverage (\texttt{mutex\_core.js}) & 98.39\% \\
+Manual evidence cases executed & 7 \\
+Curated report figures selected & 5 \\
+\bottomrule
+\end{tabular}
+\caption{Quantitative testing snapshot for the v0.3.2 baseline.}
+\label{tab:quant-snapshot}
+\end{table}
+
+\section{Evidence Capture Workflow}
+For each manual case, the following workflow was used:
+\begin{enumerate}
+  \item execute the scenario from the test plan,
+  \item export the evidence triplet,
+  \item store raw artefacts in the corresponding evidence case folder,
+  \item curate selected figures for the report,
+  \item update the evidence and figure indices.
+\end{enumerate}
+
+This provides a direct path from scenario execution to report evidence.
+
+\section{Testing Limitations}
+The testing strategy has limitations:
+\begin{itemize}
+  \item browser-level UI automation is not implemented,
+  \item some edge cases are more meaningfully validated through manual evidence than through automation,
+  \item and RA liveness under message loss is intentionally demonstrated rather than repaired.
+\end{itemize}
+
+These limitations are acceptable given the scope of an educational artefact and are made explicit to avoid over-claiming.

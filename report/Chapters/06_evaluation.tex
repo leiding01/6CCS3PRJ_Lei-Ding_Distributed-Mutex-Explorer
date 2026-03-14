@@ -1,0 +1,176 @@
+\chapter{Evaluation}
+\label{ch:evaluation}
+
+\section{Evaluation Methodology}
+The evaluation methodology is designed to answer four questions:
+\begin{enumerate}
+  \item Does the artefact preserve mutual exclusion safety?
+  \item Do the implemented fault scenarios produce meaningful and explainable behaviour?
+  \item Is the tool usable enough for learning-oriented exploration?
+  \item Are the results reproducible and traceable?
+\end{enumerate}
+
+To answer these questions, the evaluation draws on four data sources:
+\begin{itemize}
+  \item manual evidence-driven test cases,
+  \item exported evidence triplets (JSON/trace/PNG),
+  \item a Nielsen heuristic evaluation,
+  \item and CI-backed automated test outputs.
+\end{itemize}
+
+The methodology therefore combines behavioural validation, usability inspection, and reproducibility analysis rather than relying on a single metric.
+
+\section{Evaluation Criteria}
+Four criteria are used:
+\begin{itemize}
+  \item \textbf{Correctness:} preservation of the mutual exclusion safety invariant.
+  \item \textbf{Fault clarity:} faults should produce understandable and meaningful effects.
+  \item \textbf{Usability and pedagogical clarity:} users should be able to interpret state, progress, and stalled conditions.
+  \item \textbf{Reproducibility:} evidence should be regenerable from a fixed baseline.
+\end{itemize}
+
+\section{Correctness and Safety}
+Across both Token Ring and RA scenarios, the central safety invariant is preserved: at most one process may be in the critical section at any time \cite{lynch1996distributed,attiya2004distributed}. This invariant is visible through the Safety indicator and was not violated in any manual or automated test case.
+
+For Token Ring, the interpretation is straightforward: only the token holder may enter the critical section. For RA, entry requires collecting all necessary REPLY messages. In both cases, the tool’s execution and trace align with the expected safety model.
+
+\subsection{Token Ring Fault Cases}
+Token loss and crash/recover demonstrate that safety can remain intact while progress becomes impossible until recovery occurs. This supports the interpretation that correct distributed behaviour depends not only on exclusivity but also on system assumptions about resource availability.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.82\linewidth]{fig_tr_token_lost.png}
+\caption{Token Ring: token loss halts progress until regeneration is performed.}
+\label{fig:tr-token-lost}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.82\linewidth]{fig_tr_crash_recover.png}
+\caption{Token Ring: crash and recover demonstration.}
+\label{fig:tr-crash-recover}
+\end{figure}
+
+\subsection{RA Tie-break Behaviour}
+A scripted tie-break scenario demonstrates deterministic ordering when requests share the same logical timestamp. Numeric PID ordering is used to resolve the tie, ensuring a stable and explainable outcome \cite{lamport1978time,ricart1981optimal}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.82\linewidth]{fig_ra_tiebreak.png}
+\caption{RA scripted tie-break case: equal timestamps are resolved deterministically using numeric PID ordering.}
+\label{fig:ra-tiebreak}
+\end{figure}
+
+\section{Fault Demonstrations: Safety vs Liveness}
+The most pedagogically significant result is the explicit separation between safety and liveness. In the RA prototype, message loss can prevent a process from collecting all required REPLY messages, so progress may halt while mutual exclusion remains preserved \cite{lynch1996distributed}.
+
+\subsection{RA-03: Drop Next In-Flight Message}
+RA-03 demonstrates network-side message loss. Figure~\ref{fig:ra-drop-inflight} shows the stalled global state after dropping an in-flight message. The figure shows the overall state of the system, while the trace excerpt below identifies the specific missing dependency.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.82\linewidth]{fig_ra_drop_inflight_stall.png}
+\caption{RA stalled state after dropping an in-flight message; see the trace excerpt below for the missing REPLY dependency.}
+\label{fig:ra-drop-inflight}
+\end{figure}
+
+\begin{verbatim}
+Fault injected: dropped REQUEST #3 P1 -> P4.
+Stalled: P1 is waiting for REPLY from P4.
+\end{verbatim}
+
+This case demonstrates that progress can fail without violating mutual exclusion. The artefact therefore helps learners separate the notion of a correct safety property from the distinct question of eventual progress.
+
+\subsection{RA-04: Drop-Next-Send}
+RA-04 demonstrates send-side message loss. The resulting global stalled state is shown in Figure~\ref{fig:ra-drop-next-send}, and the trace excerpt below provides the causal explanation.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.82\linewidth]{fig_ra_drop_next_send_stall.png}
+\caption{RA stalled state after dropping the next outgoing message; see the trace excerpt below for the missing REPLY dependency.}
+\label{fig:ra-drop-next-send}
+\end{figure}
+
+\begin{verbatim}
+Fault armed: next outgoing message will be dropped.
+Fault injected: dropped outgoing REQUEST #1 P1 -> P2.
+Stalled: P1 is waiting for REPLY from P2.
+\end{verbatim}
+
+Together, RA-03 and RA-04 demonstrate that the artefact is not only useful for showing correct runs, but also for making fault consequences and dependency failures visible.
+
+\section{Usability Evaluation}
+Usability was assessed using Nielsen’s heuristic framework \cite{nielsen1994usability}. The updated checklist covers:
+\begin{itemize}
+  \item algorithm selection,
+  \item fault controls,
+  \item queue visibility,
+  \item trace readability,
+  \item and evidence export.
+\end{itemize}
+
+Table~\ref{tab:nielsen-summary} summarises the most relevant findings and severity ratings.
+
+\begin{table}[htbp]
+\centering
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{p{0.30\linewidth} p{0.12\linewidth} p{0.45\linewidth}}
+\toprule
+\textbf{Finding} & \textbf{Severity} & \textbf{Interpretation / Action} \\
+\midrule
+Trace clearly explains state changes and stalls & 1 & Strong learning support; retain as a core feature. \\
+Preview symbols may require a legend for new users & 2 & Add a small legend in a future iteration. \\
+Fault controls are useful but visually dense & 1 & Current grouping is acceptable; optional advanced toggle later. \\
+Algorithm differences are not explained in-app & 2 & Add concise algorithm help text later. \\
+Evidence export is useful but not fully self-explanatory to first-time users & 1 & Covered by README and appendices; in-app guidance could be improved. \\
+\bottomrule
+\end{tabular}
+\caption{Summary of key Nielsen heuristic findings (severity scale 0--4).}
+\label{tab:nielsen-summary}
+\end{table}
+
+Overall, the artefact performs well on visibility of system status, user control, and fault explainability. Remaining usability work is concentrated in discoverability and lightweight in-app guidance rather than in the correctness of interaction.
+
+\section{Reproducibility}
+Reproducibility is a major strength of the project. It is supported by:
+\begin{itemize}
+  \item a freeze baseline tag and release,
+  \item CI-backed automated tests,
+  \item evidence triplet exports,
+  \item evidence and figure indices,
+  \item and a consistent local run method.
+\end{itemize}
+
+A compact reproducibility protocol is:
+\begin{enumerate}
+  \item checkout tag \texttt{v0.3.2},
+  \item run \texttt{python -m http.server 5500},
+  \item open the local URL,
+  \item load the relevant demo or perform the manual case steps,
+  \item export the evidence triplet,
+  \item compare the exported trace and preview against the report references.
+\end{enumerate}
+
+This turns reproducibility into an executable process rather than a rhetorical claim \cite{sandve2013ten,wilson2014best,wilkinson2016fair}.
+
+\section{Threats to Validity}
+The evaluation has several limitations:
+\begin{itemize}
+  \item the queue-based network is a teaching abstraction rather than a high-fidelity asynchronous model,
+  \item RA is intentionally presented as a teaching-oriented prototype rather than a full fault-tolerant protocol,
+  \item usability was evaluated heuristically rather than through a substantial participant study.
+\end{itemize}
+
+These limitations are documented explicitly to avoid overstating the scope of the conclusions.
+
+\section{Summary}
+The evaluation shows that the artefact meets its educational objectives:
+\begin{itemize}
+  \item safety is preserved across tested scenarios,
+  \item fault injection successfully illustrates progress and liveness trade-offs,
+  \item usability is strong in visibility and control,
+  \item and reproducible evidence can be generated and audited.
+\end{itemize}
+
+The combined result is not merely a working simulator, but a reportable and inspectable educational artefact.

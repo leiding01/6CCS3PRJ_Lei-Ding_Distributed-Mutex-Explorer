@@ -1,0 +1,109 @@
+\chapter{Specification and Design}
+\label{ch:design}
+
+\section{Development Methodology}
+The project followed an iterative and incremental development methodology. Early iterations focused on establishing a stable simulation core and a minimal browser-based interface. Later iterations added:
+\begin{itemize}
+  \item fault injection and recovery controls,
+  \item scripted scenarios for repeatable demonstrations,
+  \item evidence export,
+  \item and reproducibility features such as CI-backed smoke tests and indexed evidence sets.
+\end{itemize}
+
+A feature freeze baseline was established at \texttt{v0.3.2}. This separated artefact development from report writing and evidence curation. The approach can therefore be characterised as \textbf{evidence-driven refinement}: once the core features were stable, subsequent changes focused on testing, traceability, and report support rather than introducing new behaviours.
+
+\section{Requirements Approach}
+A lightweight but structured requirements approach was adopted, consistent with software requirements guidance \cite{ieee830_1998}. Requirements were derived from the project brief, the educational objective of the artefact, and the need to support clear evaluation.
+
+\section{Functional Requirements}
+The main functional requirements are:
+\begin{itemize}
+  \item \textbf{FR1: Configuration.} Users can select the algorithm and number of processes.
+  \item \textbf{FR2: Interactive execution.} Users can request/release the critical section and advance execution using Step, Run, Pause, and Reset.
+  \item \textbf{FR3: State visibility.} The tool exposes process state, safety status, and, for RA, the message queue.
+  \item \textbf{FR4: Fault handling.} Users can inject representative faults and, where appropriate, recovery actions.
+  \item \textbf{FR5: Scripted scenarios.} Users can load deterministic demonstrations for teaching and evidence capture.
+  \item \textbf{FR6: Evidence export.} Users can export a state snapshot, trace, and preview image.
+\end{itemize}
+
+\section{Non-functional Requirements}
+The principal non-functional requirements are:
+\begin{itemize}
+  \item \textbf{NFR1: Safety.} Mutual exclusion must be preserved.
+  \item \textbf{NFR2: Clarity.} Users should be able to explain why progress occurs or stalls.
+  \item \textbf{NFR3: Reproducibility.} Scenarios and evidence must be repeatable.
+  \item \textbf{NFR4: Portability.} The artefact should run in a modern browser without external dependencies.
+  \item \textbf{NFR5: Maintainability.} The codebase should remain small and modular.
+\end{itemize}
+
+\section{Architecture Overview}
+The architecture is divided into two principal layers:
+\begin{itemize}
+  \item \textbf{Core simulation layer:} maintains algorithm state, defines transitions, checks safety, and handles import/export.
+  \item \textbf{UI controller layer:} renders state, handles input, and coordinates user-facing behaviour.
+\end{itemize}
+
+This separation reduces coupling and supports headless automated testing of the core logic \cite{gamma1994design}. It also allows the UI to be refined without changing the semantics of the algorithms.
+
+\section{Requirements-to-Design Traceability}
+To make the design rationale explicit, Table~\ref{tab:req-trace} maps key requirements to the corresponding design decisions.
+
+\begin{table}[htbp]
+\centering
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{p{0.22\linewidth} p{0.28\linewidth} p{0.38\linewidth}}
+\toprule
+\textbf{Requirement} & \textbf{Design decision} & \textbf{Rationale} \\
+\midrule
+Fault demonstration & Token loss, crash/recover, drop-next-send, drop in-flight message & Makes the consequences of violated assumptions directly observable; supports safety vs liveness teaching. \\
+Reproducibility & Scripted demos + evidence export + freeze baseline & Enables report claims to be audited and scenarios to be replayed consistently. \\
+Clarity & Trace + queue table + preview canvas + safety indicator & Reduces hidden state and supports step-by-step explanation. \\
+Maintainability & Separation between core engine and UI controller & Keeps algorithmic behaviour testable and reduces accidental coupling. \\
+Portability & Browser-only, dependency-free implementation & Lowers deployment friction and supports static hosting. \\
+\bottomrule
+\end{tabular}
+\caption{Requirements-to-design traceability.}
+\label{tab:req-trace}
+\end{table}
+
+\section{Execution Model}
+A central design decision is the use of a \textbf{step engine}. Each press of \texttt{Step} advances the simulation by one minimal unit of progress:
+\begin{itemize}
+  \item Token Ring: token movement or critical section transition.
+  \item Ricart--Agrawala: delivery of exactly one queued message.
+\end{itemize}
+
+This is a deliberate design choice rather than an implementation convenience. A queue-based, stepwise execution model is easier to reason about pedagogically than a hidden asynchronous scheduler, because learners can directly observe which action caused which state change.
+
+\section{Key Design Trade-offs}
+Several trade-offs were made consciously:
+
+\subsection{Queue-Based Network Abstraction}
+The RA network is modelled as a FIFO queue of in-flight messages. This is less realistic than a general asynchronous network model, but more suitable for teaching because:
+\begin{itemize}
+  \item one step corresponds to one visible message delivery,
+  \item queue state can be shown in a table,
+  \item and message-loss faults can be injected in a controlled way.
+\end{itemize}
+
+\subsection{No Retransmission or Failure Detector}
+The RA implementation does not include retransmission, timeouts, or failure detectors. This is intentional. The project aims to demonstrate that liveness can fail when assumptions are weakened. Adding recovery protocols would make the model more realistic, but would also reduce the clarity of the core teaching point \cite{chandra1996failure}.
+
+\subsection{Browser-Only and Dependency-Free}
+A browser-only artefact was chosen for accessibility, deployment simplicity, and sustainability. This reduces installation overhead and makes the tool easier to reproduce and distribute.
+
+\section{Reproducibility by Design}
+Reproducibility is built into the design through:
+\begin{itemize}
+  \item a freeze baseline tag and release,
+  \item scripted demos,
+  \item evidence triplet export,
+  \item indexed evidence and figure mappings,
+  \item and CI-backed smoke tests.
+\end{itemize}
+
+This ensures that evaluation is not just descriptive, but backed by re-runnable artefacts and documented procedures \cite{sandve2013ten,wilson2014best,wilkinson2016fair}.
+
+\section{Design Summary}
+The design of the artefact is guided by a simple principle: \emph{make distributed mutual exclusion visible, explainable, and reproducible}. The resulting system is intentionally modest in algorithmic breadth, but strong in clarity, traceability, and suitability for evaluation.

@@ -1,0 +1,110 @@
+\chapter{Professional Issues}
+\label{ch:professional}
+
+\section{Overview}
+Final-year computing projects are expected to address not only technical correctness, but also the broader professional issues that shape responsible software development. For this project, the most relevant issues are:
+\begin{itemize}
+  \item accessibility,
+  \item privacy and data handling,
+  \item sustainability and maintainability,
+  \item reproducibility and research integrity,
+  \item and ethics in evaluation and communication.
+\end{itemize}
+
+These issues are particularly important because the artefact is intended as an educational tool: its value depends not only on whether it works, but also on whether it can be used, trusted, maintained, and interpreted responsibly.
+
+\section{Accessibility}
+Accessibility is an important professional responsibility for educational software. A tool designed to support learning should not unnecessarily exclude users because of avoidable interface barriers. Current accessibility-relevant strengths of the artefact include:
+\begin{itemize}
+  \item explicit textual status indicators (for example, process states, the Safety indicator, and trace messages),
+  \item grouped controls with consistent action labels,
+  \item and the use of multiple views (tables, trace, preview) so that critical information is not conveyed only through a single visual channel.
+\end{itemize}
+
+These design choices are helpful, but they do not by themselves guarantee accessibility. Relative to accessibility guidance such as WCAG 2.2 and ARIA recommendations \cite{w3c_wcag22,w3c_aria12}, several limitations remain:
+\begin{itemize}
+  \item the interface has not been systematically evaluated for keyboard-only navigation,
+  \item screen-reader behaviour has not been formally tested,
+  \item and some visual markers in the preview (for example, the request marker, token indicator, and crash marker) may still benefit from a compact legend or additional textual equivalents.
+\end{itemize}
+
+Accordingly, the current position of the project is that accessibility has been considered at a basic practical level, but there remains clear scope for improvement in a future iteration. This is acceptable for a prototype, provided the limitation is stated explicitly.
+
+\section{Privacy and Data Handling}
+The privacy implications of the artefact are limited, because the simulator is designed to run locally or as a static web page and does not require user accounts or server-side storage. By default:
+\begin{itemize}
+  \item no personal data are collected,
+  \item no analytics are embedded,
+  \item and exported JSON/trace/PNG files contain only simulation state and evidence data.
+\end{itemize}
+
+This is a positive design choice because it reduces risk and simplifies both deployment and explanation. However, privacy still matters at the level of workflow and reporting. If screenshots, traces, or future participant feedback are collected, these materials should be managed carefully and stored only where necessary. In the current project, all evidence is technical rather than personal, which keeps privacy concerns low.
+
+\section{Ethics and Research Governance}
+No formal human-subject study was conducted as part of the current evaluation. The evaluation therefore remains within a low-risk scope based on:
+\begin{itemize}
+  \item manual evidence-driven testing,
+  \item heuristic usability inspection,
+  \item and automated testing of the artefact itself.
+\end{itemize}
+
+This is an important point for research governance: the current report does not make claims based on participant data, and therefore does not present the artefact as having been validated through a controlled human study.
+
+If the project were extended to include participant-based evaluation (for example, a structured comparison of learner performance or a SUS questionnaire), appropriate ethical safeguards would be required. These would include:
+\begin{itemize}
+  \item informed consent,
+  \item data minimisation,
+  \item anonymisation where appropriate,
+  \item and compliance with the university’s relevant ethics procedures.
+\end{itemize}
+
+Stating this boundary clearly avoids over-claiming the scope of the present evaluation.
+
+\section{Sustainability and Maintainability}
+A major professional consideration for software artefacts is whether they remain maintainable over time. In this project, sustainability was addressed through several practical engineering choices:
+\begin{itemize}
+  \item the artefact is dependency-free and browser-based,
+  \item the codebase is intentionally small,
+  \item the core simulation engine is separated from the UI layer,
+  \item and version control plus tagged releases provide traceability.
+\end{itemize}
+
+These choices reduce the likelihood of build breakage due to external dependency drift and make the system easier to understand and evolve. In this sense, the project adopts a deliberately conservative architecture in order to improve long-term robustness \cite{chacon2014progit,wilson2014best}.
+
+At the same time, maintainability is not only a question of code structure. It also depends on whether decisions are documented and whether testing protects against regressions. The inclusion of smoke tests, unit tests, evidence indices, and release notes therefore contributes directly to maintainability.
+
+\section{Reproducibility and Research Integrity}
+Reproducibility is one of the strongest professional aspects of the project. Rather than treating reproducibility as an optional afterthought, the project integrates it into the artefact workflow itself. Specifically:
+\begin{itemize}
+  \item the project defines a freeze baseline release,
+  \item evidence is exported as a triplet (state JSON, trace TXT, preview PNG),
+  \item evidence indices and figure indices map report claims to raw artefacts,
+  \item and CI-backed smoke tests provide automated regression checks.
+\end{itemize}
+
+This supports research integrity in two ways. First, it makes the evaluation claims auditable. Second, it reduces the risk that report figures and conclusions become detached from the actual implementation \cite{sandve2013ten,wilson2014best,wilkinson2016fair}.
+
+A related issue is honest communication of uncertainty. The report explicitly distinguishes between:
+\begin{itemize}
+  \item what is demonstrated empirically,
+  \item what is inferred from those demonstrations,
+  \item and what remains out of scope.
+\end{itemize}
+For example, the Ricart--Agrawala implementation is described as a teaching-oriented prototype rather than a fully fault-tolerant production protocol. This is not merely a wording choice; it is part of maintaining professional and academic integrity.
+
+\section{Responsible Communication of Limitations}
+A professional report should make limitations clear rather than hide them. This project has several important limitations:
+\begin{itemize}
+  \item the network is modelled as a queue-based teaching abstraction,
+  \item retransmission and failure detectors are not implemented,
+  \item usability evaluation is heuristic rather than participant-based,
+  \item and some accessibility aspects remain future work.
+\end{itemize}
+
+These limitations are not failures of the project; rather, they are part of its scope definition. The responsible approach is to explain them clearly and to avoid making claims that would imply a stronger validation or a more realistic distributed environment than the project actually provides.
+
+\section{Professional Standards and Evaluation Practice}
+Usability discussion in this report is informed by Nielsen’s heuristics \cite{nielsen1994usability} and broader usability concepts from ISO 9241-11 \cite{iso9241_11_2018}. These frameworks help anchor the evaluation in recognised professional practice. Similarly, reproducibility and version-control choices align the project with established norms in research software development \cite{sandve2013ten,wilson2014best,chacon2014progit}.
+
+\section{Summary}
+The professional issues analysis shows that the project is not only technically competent, but also developed with attention to responsible software practice. Its main strengths are low privacy risk, strong reproducibility, and a maintainable architecture. Its main limitations lie in accessibility completeness and the absence of participant-based evaluation. These are acceptable for the current scope, provided they are documented transparently and treated as priorities for future work.
